@@ -1,0 +1,2971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#04120E" />
+  <title>Simple Budget — Commercial Pro Edition</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS for Multi-Tab Excel (.xlsx) Backup & Restore -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Google Fonts: Inter, JetBrains Mono & Space Mono (Nothing OS style) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" signature="true" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Default: Blue & Emerald Wealth Blend */
+      --bg-main: #04120E;
+      --bg-card: #091E17;
+      --bg-elevated: #102D23;
+      --border-color: #194234;
+      --text-main: #F3F8F6;
+      --text-muted: #8AA399;
+      --accent-primary: #10B981;
+      --accent-secondary: #38BDF8;
+      --accent-gradient: linear-gradient(135deg, #38BDF8 0%, #10B981 100%);
+      --accent-fg: #03150F;
+      --anim-speed: 0.32s;
+    }
+
+    /* Theme 2: Ocean Blue Trust */
+    body.theme-ocean {
+      --bg-main: #040D1A;
+      --bg-card: #0A192F;
+      --bg-elevated: #112240;
+      --border-color: #1E3A63;
+      --text-main: #F0F6FC;
+      --text-muted: #8B9EB7;
+      --accent-primary: #38BDF8;
+      --accent-secondary: #6366F1;
+      --accent-gradient: linear-gradient(135deg, #38BDF8 0%, #2563EB 100%);
+      --accent-fg: #040D1A;
+    }
+
+    /* Theme 3: OLED Pure Monochrome */
+    body.theme-oled {
+      --bg-main: #000000;
+      --bg-card: #0D0D0D;
+      --bg-elevated: #171717;
+      --border-color: #262626;
+      --text-main: #FFFFFF;
+      --text-muted: #8E8E93;
+      --accent-primary: #FFFFFF;
+      --accent-secondary: #A3A3A3;
+      --accent-gradient: linear-gradient(135deg, #FFFFFF 0%, #D4D4D8 100%);
+      --accent-fg: #000000;
+    }
+
+    /* Theme 4: Warm Paper Light */
+    body.theme-paper {
+      --bg-main: #F5F5F2;
+      --bg-card: #FFFFFF;
+      --bg-elevated: #EAEAE4;
+      --border-color: #D6D6CE;
+      --text-main: #111815;
+      --text-muted: #5B6660;
+      --accent-primary: #059669;
+      --accent-secondary: #0284C7;
+      --accent-gradient: linear-gradient(135deg, #0284C7 0%, #059669 100%);
+      --accent-fg: #FFFFFF;
+    }
+
+    /* Ultra Low-Battery Saver Mode for Older Android Phones */
+    body.perf-saver * {
+      animation: none !important;
+      transition: none !important;
+      backdrop-filter: none !important;
+      box-shadow: none !important;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      overscroll-behavior-y: none;
+      overflow-x: hidden;
+    }
+
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    .app-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .app-elevated {
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .app-muted { color: var(--text-muted); }
+
+    .app-gradient-btn {
+      background: var(--accent-gradient);
+      color: var(--accent-fg);
+    }
+
+    /* 120Hz / 90Hz Hardware Accelerated Island & Modals */
+    .gpu-smooth {
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      will-change: transform, opacity;
+      transition: all var(--anim-speed) cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes floatNote1 {
+      0% { transform: translate3d(0, 0, 0) scale(0.75); opacity: 0; }
+      45% { opacity: 1; }
+      100% { transform: translate3d(14px, -16px, 0) scale(1.2); opacity: 0; }
+    }
+    @keyframes floatNote2 {
+      0% { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
+      55% { opacity: 1; }
+      100% { transform: translate3d(20px, -8px, 0) scale(1.1); opacity: 0; }
+    }
+    @keyframes sweatDrop {
+      0% { transform: translate3d(0, 0, 0); opacity: 0.95; }
+      70% { transform: translate3d(0, 8px, 0); opacity: 0.95; }
+      100% { transform: translate3d(0, 11px, 0); opacity: 0; }
+    }
+    @keyframes scanLaser {
+      0% { top: 8%; }
+      50% { top: 88%; }
+      100% { top: 8%; }
+    }
+
+    .whistle-note-1 { animation: floatNote1 1.5s infinite ease-out; }
+    .whistle-note-2 { animation: floatNote2 1.8s infinite 0.35s ease-out; }
+    .sweat-anim { animation: sweatDrop 1.3s infinite ease-in; }
+    .ocr-laser { animation: scanLaser 2.2s infinite ease-in-out; }
+
+    /* Modern Glassmorphic Financial Memo Pad */
+    .memo-paper {
+      background: linear-gradient(165deg, rgba(16, 45, 35, 0.75) 0%, rgba(9, 30, 23, 0.95) 100%);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    .memo-ruled {
+      background-image: linear-gradient(to bottom, transparent 27px, rgba(56, 189, 248, 0.08) 28px);
+      background-size: 100% 28px;
+      line-height: 28px;
+    }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.25); border-radius: 9999px; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-start">
+
+  <!-- BIOMETRIC SCREEN LOCK OVERLAY -->
+  <div id="biometricLockOverlay" class="fixed inset-0 z-[90] hidden bg-[#030F0B]/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center">
+    <div class="w-20 h-20 rounded-3xl app-card flex items-center justify-center mb-4 shadow-2xl border border-[#38BDF8]/40">
+      <div id="lockScreenMascot" class="w-14 h-14"></div>
+    </div>
+    <h2 class="text-lg font-extrabold tracking-tight">Simple Budget Locked</h2>
+    <p class="text-xs app-muted mt-1 max-w-[260px]">Authenticate with Fingerprint or Face Unlock to view your financial ledger.</p>
+    <button onclick="unlockWithBiometrics()" class="mt-6 px-6 py-3.5 rounded-2xl app-gradient-btn font-extrabold text-xs flex items-center gap-2 shadow-xl active:scale-95 transition">
+      <span>🔐</span>
+      <span>Touch Fingerprint / Face Unlock</span>
+    </button>
+  </div>
+
+  <!-- ========================================================== -->
+  <!-- ANDROID PERMISSION GATEKEEPER & 24-HOUR DAILY RE-PROMPT    -->
+  <!-- ========================================================== -->
+  <div id="permissionPromptModal" class="fixed inset-0 z-[85] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="app-card w-full max-w-[395px] rounded-3xl p-5 space-y-4 shadow-2xl border border-[#38BDF8]/40">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div id="permMascotBox" class="w-11 h-11 rounded-2xl app-elevated p-1 shrink-0"></div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h3 class="text-sm font-extrabold">Required App Permissions</h3>
+              <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-bold">ANDROID</span>
+            </div>
+            <p id="permCooldownSubtitle" class="text-[10.5px] app-muted">Needed for Dynamic Island UPI & OCR</p>
+          </div>
+        </div>
+        <button onclick="dismissPermissionModalForToday()" class="p-1.5 rounded-xl app-elevated text-xs" title="Remind me tomorrow">✕</button>
+      </div>
+
+      <p class="text-[11px] app-muted leading-relaxed">
+        To detect GPay/PhonePe payments in the Dynamic Island and scan receipts, Simple Budget needs the following permissions. <span class="text-[#38BDF8] font-semibold">If denied, we will only remind you once per day.</span>
+      </p>
+
+      <!-- Individual Permission Checklist -->
+      <div id="permissionChecklistContainer" class="space-y-2 max-h-[270px] overflow-y-auto pr-0.5"></div>
+
+      <!-- Actions -->
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="dismissPermissionModalForToday()" class="py-2.5 rounded-2xl app-elevated font-bold text-xs text-[#8AA399] hover:text-white">
+          Ask Tomorrow (24h)
+        </button>
+        <button onclick="grantAllMissingPermissions()" class="py-2.5 rounded-2xl app-gradient-btn font-extrabold text-xs shadow-lg">
+          ✓ Allow All Required
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN MOBILE SHELL -->
+  <div class="w-full max-w-[445px] min-h-screen flex flex-col relative pb-28">
+
+    <!-- TOP STATUS & BACKGROUND SIMULATION BAR -->
+    <div class="px-3 pt-2.5 z-40 space-y-1.5">
+      <div class="app-card rounded-2xl p-2 flex items-center justify-between gap-2 shadow-lg">
+        <div class="flex items-center gap-2 min-w-0 pl-1">
+          <span id="appStateDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+          <span id="appStateText" class="text-[11px] font-semibold truncate">In-App Mode (Island Standby)</span>
+        </div>
+        <button id="bgToggleBtn" onclick="toggleBackgroundSimulation()" class="px-3 py-1.5 rounded-xl text-[11px] font-bold app-gradient-btn active:scale-95 transition shrink-0">
+          📱 Minimize App (Test Island)
+        </button>
+      </div>
+
+      <!-- MISSING PERMISSION WARNING BANNER (SHOWN IF ANY PERMISSION IS DENIED) -->
+      <div id="missingPermBanner" onclick="openPermissionModal(true)" class="hidden app-card border border-amber-500/40 bg-amber-500/10 rounded-2xl px-3 py-2 flex items-center justify-between gap-2 cursor-pointer">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-xs">⚠️</span>
+          <span id="missingPermBannerText" class="text-[10.5px] font-semibold text-amber-300 truncate">Permissions missing for Dynamic Island • Tap to review</span>
+        </div>
+        <span class="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-lg bg-amber-400 text-black shrink-0">Fix</span>
+      </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- BACKGROUND PHONE HOME SCREEN (DYNAMIC ISLAND ONLY HERE)    -->
+    <!-- ========================================================== -->
+    <div id="backgroundPhoneScreen" class="hidden flex-col items-center justify-between flex-1 px-4 py-3">
+      
+      <!-- PUNCH-HOLE DYNAMIC ISLAND OVERLAY -->
+      <div class="w-full flex flex-col items-center pt-1">
+        <div id="dynamicIsland" onclick="expandDynamicIsland()"
+             class="gpu-smooth bg-[#020B08] text-white border border-[#1E4E3D] rounded-[30px] w-[285px] h-[46px] px-3.5 flex flex-col justify-between overflow-hidden cursor-pointer shadow-[0_14px_45px_rgba(0,0,0,0.92)]">
+          
+          <!-- Compact Pill Header -->
+          <div class="w-full h-[44px] shrink-0 flex items-center justify-between gap-2 select-none">
+            <div class="flex items-center gap-2 min-w-0">
+              <div id="islandCatMini" class="w-7 h-7 shrink-0 flex items-center justify-center"></div>
+              <!-- Simulated POCO X6 Pro Front Camera Cutout -->
+              <div class="w-3 h-3 rounded-full bg-black border border-neutral-800 shrink-0"></div>
+              <div id="islandCompactLabel" class="text-[11.5px] font-semibold tracking-tight truncate text-[#38BDF8]">
+                Waiting for UPI / Salary...
+              </div>
+            </div>
+            <span id="islandActionPill" class="text-[10px] font-mono font-extrabold px-2.5 py-0.5 rounded-full app-gradient-btn shrink-0">
+              ♪ LOG
+            </span>
+          </div>
+
+          <!-- Expanded Dynamic Island Body (With Expense vs Salary/Income Toggle!) -->
+          <div id="islandExpandedBody" class="hidden flex-col gap-2.5 pt-2 pb-3.5 text-left border-t border-[#194234] mt-1">
+            <div class="flex items-center justify-between bg-[#081A14] px-3 py-2 rounded-2xl border border-[#194234]">
+              <div class="flex items-center gap-2.5">
+                <div id="islandCatLarge" class="w-11 h-11 shrink-0"></div>
+                <div>
+                  <div id="islandWhistleTitle" class="text-xs font-extrabold text-white">Penny Whistling ♪ ♫</div>
+                  <div class="text-[10px] text-[#8AA399]">Auto-parsed from Android notification</div>
+                </div>
+              </div>
+              <button onclick="collapseDynamicIsland(event)" class="p-1.5 rounded-full bg-[#102D23] text-[#8AA399] hover:text-white text-xs">✕</button>
+            </div>
+
+            <!-- Expense (-) vs Salary / Income (+) Switch inside Island -->
+            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#081A14] border border-[#194234]">
+              <button type="button" id="islandBtnExp" onclick="event.stopPropagation(); setIslandType('expense')" class="py-1.5 rounded-lg text-xs font-extrabold app-gradient-btn">
+                💸 Expense (OUT)
+              </button>
+              <button type="button" id="islandBtnInc" onclick="event.stopPropagation(); setIslandType('income')" class="py-1.5 rounded-lg text-xs font-extrabold text-[#8AA399]">
+                💰 Salary / Income (+)
+              </button>
+            </div>
+
+            <!-- Amount & Date -->
+            <div class="grid grid-cols-12 gap-2">
+              <div class="col-span-7 relative">
+                <span class="curr-symbol absolute left-3 top-1/2 -translate-y-1/2 text-sm font-mono font-bold text-[#38BDF8]">₹</span>
+                <input id="islandInputAmount" type="number" step="any" onclick="event.stopPropagation()" placeholder="0"
+                       class="w-full bg-[#081A14] border border-[#194234] focus:border-[#38BDF8] rounded-xl py-2 pl-7 pr-2 text-sm font-mono font-bold text-white outline-none" />
+              </div>
+              <div class="col-span-5">
+                <button type="button" id="islandDateBtn" onclick="event.stopPropagation(); openCalendarModal('island')"
+                        class="w-full h-full bg-[#081A14] border border-[#194234] rounded-xl py-2 px-2 text-center text-xs font-mono font-bold text-white flex items-center justify-center gap-1">
+                  <span>📅</span>
+                  <span id="islandDateText">8-Nov</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Payment Type Chips in Island -->
+            <div id="islandPaymentChips" class="flex gap-1.5 overflow-x-auto pb-0.5"></div>
+
+            <!-- Category Chips in Island -->
+            <div id="islandCategoryChips" class="flex flex-wrap gap-1.5 max-h-[76px] overflow-y-auto"></div>
+
+            <!-- Merchant Note + 1-Tap Save -->
+            <div class="flex gap-2 pt-0.5">
+              <input id="islandInputNote" type="text" onclick="event.stopPropagation()" placeholder="Note / Merchant / Salary..."
+                     class="flex-1 bg-[#081A14] border border-[#194234] rounded-xl px-3 py-2 text-xs text-white outline-none" />
+              <button onclick="saveFromDynamicIsland(event)" class="app-gradient-btn font-extrabold text-xs px-4 py-2 rounded-xl shrink-0 shadow-lg">
+                ✓ Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulated Android Home Screen Triggers -->
+      <div class="app-card rounded-3xl p-5 text-center space-y-3.5 my-auto w-full shadow-2xl">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full app-elevated text-[11px] font-mono text-[#38BDF8]">
+          <span>⚡ Android Background Notification Simulator</span>
+        </div>
+        <h3 class="text-sm font-extrabold">Test UPI Payment & Salary Inflow</h3>
+        <p class="text-xs app-muted">Since Simple Budget is minimized, any UPI payment or Salary SMS triggers Penny in the Dynamic Island above:</p>
+        
+        <div class="grid grid-cols-2 gap-2.5 text-left">
+          <button onclick="triggerBackgroundUpi('UPI Lite', 260, 'Food', 'Shalimar Dum Biryani', false)" class="p-3 rounded-2xl app-elevated hover:border-[#38BDF8] transition active:scale-95">
+            <div class="text-xs font-extrabold text-[#38BDF8]">⚡ UPI Lite ₹260</div>
+            <div class="text-[10px] app-muted mt-0.5">Expense • Food</div>
+          </button>
+          <button onclick="triggerBackgroundUpi('Bank', 350, 'Petrol', 'BPCL Petrol Pump', false)" class="p-3 rounded-2xl app-elevated hover:border-[#38BDF8] transition active:scale-95">
+            <div class="text-xs font-extrabold text-sky-400">⛽ GPay ₹350</div>
+            <div class="text-[10px] app-muted mt-0.5">Expense • Petrol</div>
+          </button>
+          <button onclick="triggerBackgroundUpi('Bank', 38500, 'Salary', 'Monthly Salary Credited', true)" class="p-3 rounded-2xl app-elevated hover:border-emerald-400 transition active:scale-95">
+            <div class="text-xs font-extrabold text-emerald-400">💰 Salary ₹38,500</div>
+            <div class="text-[10px] app-muted mt-0.5">Income (+) • Bank NEFT</div>
+          </button>
+          <button onclick="triggerBackgroundUpi('Bank', 2500, 'Other Income', 'Freelance / Cashback', true)" class="p-3 rounded-2xl app-elevated hover:border-emerald-400 transition active:scale-95">
+            <div class="text-xs font-extrabold text-emerald-400">💵 Received ₹2,500</div>
+            <div class="text-[10px] app-muted mt-0.5">Income (+) • UPI Credit</div>
+          </button>
+        </div>
+
+        <button onclick="toggleBackgroundSimulation()" class="w-full py-3 rounded-2xl app-gradient-btn font-extrabold text-xs shadow-lg">
+          Return to Simple Budget App
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- FOREGROUND APP VIEW                                        -->
+    <!-- ========================================================== -->
+    <div id="foregroundAppContainer" class="flex-1 flex flex-col">
+
+      <!-- APP HEADER -->
+      <header class="px-4 pt-3 pb-2 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div id="headerMascotBox" onclick="cycleMascotMood()" title="Tap to preview Penny's moods"
+               class="w-12 h-12 rounded-2xl app-card flex items-center justify-center cursor-pointer shrink-0 shadow-md relative">
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <h1 class="text-base font-extrabold tracking-tight truncate">Simple Budget</h1>
+              <span id="mascotMoodBadge" class="text-[9.5px] font-mono uppercase px-2 py-0.5 rounded-full app-elevated font-bold text-[#38BDF8]">CALM</span>
+            </div>
+            <p id="mascotStatusLine" class="text-[11px] app-muted truncate">Penny: Spending is right on track!</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 shrink-0">
+          <!-- Quick OCR Receipt Camera Button -->
+          <button onclick="openReceiptScannerModal()" title="Scan Receipt (OCR)" class="p-2 rounded-xl app-card hover:border-[#38BDF8] text-xs font-bold flex items-center gap-1 active:scale-95 transition">
+            <span>📸</span>
+            <span class="text-[10px] hidden sm:inline">OCR</span>
+          </button>
+          <!-- Month Selector -->
+          <div class="app-card px-2.5 py-1.5 rounded-xl">
+            <select id="activeMonthSelect" onchange="changeActiveMonth(this.value)" class="bg-transparent text-xs font-mono font-extrabold outline-none cursor-pointer text-[#38BDF8]">
+              <option value="NOV26" class="bg-[#091E17] text-white">NOV26</option>
+              <option value="OCT26" class="bg-[#091E17] text-white">OCT26</option>
+              <option value="SEP26" class="bg-[#091E17] text-white">SEP26</option>
+              <option value="AUG26" class="bg-[#091E17] text-white">AUG26</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN TAB CONTENT -->
+      <main class="flex-1 px-4 pt-1 space-y-4">
+
+        <!-- ====================================================== -->
+        <!-- TAB 1: HOME (CLEAN GOALS + TRANSACTIONS / GRAPHICS)    -->
+        <!-- ====================================================== -->
+        <section id="view-home" class="space-y-3.5">
+          
+          <!-- Hero Balance & Monthly Budget Bar -->
+          <div class="app-card rounded-3xl p-4 shadow-xl space-y-3 relative overflow-hidden">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <span id="monthHeaderLabel" class="text-[10px] font-mono uppercase tracking-wider app-muted">NOV26</span>
+                <div class="flex items-baseline gap-2 mt-0.5">
+                  <span id="heroLeftBalance" class="text-2xl font-mono font-extrabold text-[#38BDF8]">₹0</span>
+                  <span class="text-[11px] app-muted">Balance</span>
+                </div>
+              </div>
+              <button onclick="openAddEntryModal()" class="app-gradient-btn px-4 py-2.5 rounded-2xl font-extrabold text-xs shadow-lg active:scale-95 transition">
+                + Add Entry
+              </button>
+            </div>
+
+            <!-- Total Spent vs Total Earned Cards -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="p-3 rounded-2xl app-elevated flex items-center justify-between">
+                <div>
+                  <div class="text-[10px] app-muted uppercase font-semibold">Spent</div>
+                  <div id="heroTotalExpense" class="text-sm font-mono font-extrabold mt-0.5 text-rose-400">₹0</div>
+                </div>
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-rose-500/15 text-rose-400">OUT</span>
+              </div>
+              <div class="p-3 rounded-2xl app-elevated flex items-center justify-between">
+                <div>
+                  <div class="text-[10px] app-muted uppercase font-semibold">Earned</div>
+                  <div id="heroTotalIncome" class="text-sm font-mono font-extrabold mt-0.5 text-emerald-400">₹0</div>
+                </div>
+                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-400">IN</span>
+              </div>
+            </div>
+
+            <!-- Monthly Expense Target Progress Bar -->
+            <div class="space-y-1.5 pt-0.5">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="app-muted font-medium">Monthly Limit (<span id="budgetTargetLabel" class="font-mono text-white">₹15,000</span>)</span>
+                <button onclick="promptMonthlyBudget()" class="text-[#38BDF8] font-mono font-bold underline">Edit</button>
+              </div>
+              <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+                <div id="budgetProgressBar" class="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-[#38BDF8] to-[#10B981]" style="width: 0%"></div>
+              </div>
+              <div class="flex justify-between text-[10px] font-mono app-muted">
+                <span id="budgetPctText">0% used</span>
+                <span id="budgetRemainingText">₹15,000 left</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CLEAN GOALS STRIP ON HOME SCREEN -->
+          <div class="app-card rounded-3xl p-3.5 shadow-lg space-y-2.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🎯</span>
+                <h2 class="text-xs font-extrabold uppercase tracking-wider">Goals</h2>
+                <span id="homePiggyBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full app-elevated text-emerald-400">₹0</span>
+              </div>
+              <button onclick="switchTab('tools'); switchToolSubTab('piggy')" class="text-[10px] font-mono font-bold text-[#38BDF8] hover:underline">
+                Manage →
+              </button>
+            </div>
+            <div id="homeGoalsCompactList" class="grid grid-cols-2 gap-2"></div>
+          </div>
+
+          <!-- UNIFIED TRANSACTIONS vs VISUAL GRAPHICS CARD (TOGGLE SWITCH) -->
+          <div class="app-card rounded-3xl overflow-hidden shadow-lg">
+            <div class="px-4 py-3 border-b border-[#194234] flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <h2 id="homeMainFeedTitle" class="text-xs font-extrabold uppercase tracking-wider">Transactions</h2>
+                <span id="activityCountBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full app-elevated text-[#38BDF8]">0</span>
+              </div>
+              <!-- Toggle Switch: List vs Visual Graphics -->
+              <div class="flex items-center p-0.5 rounded-xl bg-[#04120E] border border-[#194234]">
+                <button id="btnShowTxList" onclick="toggleHomeFeedMode('list')" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold app-gradient-btn transition">
+                  ≣ List
+                </button>
+                <button id="btnShowVisuals" onclick="toggleHomeFeedMode('graphics')" class="px-2.5 py-1 rounded-lg text-[10px] font-extrabold app-muted transition">
+                  ◔ Graphics
+                </button>
+              </div>
+            </div>
+
+            <!-- VIEW A: TRANSACTIONS LIST (DEFAULT - MAXIMUM SPACE) -->
+            <div id="recentActivityList" class="divide-y divide-[#194234] max-h-[450px] overflow-y-auto"></div>
+
+            <!-- VIEW B: VISUAL GRAPHICS (DONUT CHART + COMPACT BARS, HIDES TRANSACTIONS) -->
+            <div id="homeVisualGraphicsPanel" class="hidden p-4 space-y-4">
+              <!-- Donut Ring & Center Stat -->
+              <div class="flex items-center justify-around gap-4 py-1">
+                <div id="homeDonutChartBox" class="w-32 h-32 relative flex items-center justify-center shrink-0"></div>
+                <div id="homeDonutLegend" class="flex-1 space-y-1.5 text-xs"></div>
+              </div>
+              <!-- Compact Category Spend & Earn Bars -->
+              <div class="border-t border-[#194234] pt-3 space-y-2 max-h-[240px] overflow-y-auto pr-1" id="homeCategorySpendEarnList"></div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ====================================================== -->
+        <!-- TAB 2: MULTI-MONTH COMPARISON & VISUAL ANALYTICS       -->
+        <!-- ====================================================== -->
+        <section id="view-analytics" class="hidden space-y-4">
+          <div class="app-card rounded-3xl p-4 space-y-3.5 shadow-lg">
+            <div class="flex items-center justify-between">
+              <h2 class="text-sm font-extrabold">Compare Months</h2>
+              <button onclick="openShareCardModal()" class="app-gradient-btn px-3 py-1.5 rounded-xl text-xs font-extrabold shadow">
+                📤 Share
+              </button>
+            </div>
+
+            <!-- Multi-Select Month Chips (Select 2, 3, or All Months) -->
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[10px] font-mono app-muted">
+                <span>SELECT MONTHS TO COMPARE</span>
+                <button onclick="selectAllCompareMonths()" class="text-[#38BDF8] font-bold underline">Select All</button>
+              </div>
+              <div id="multiMonthCompareChips" class="flex flex-wrap gap-1.5"></div>
+            </div>
+
+            <!-- Multi-Month Visual Grouped Bar Chart -->
+            <div id="multiMonthVisualChart" class="p-3.5 rounded-2xl app-elevated space-y-2.5"></div>
+
+            <!-- Multi-Month Summary Grid -->
+            <div id="compareSummaryCards" class="grid grid-cols-2 gap-2"></div>
+
+            <!-- Payment Method Breakdown -->
+            <div class="pt-1 space-y-2">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider">Payment Split (<span id="compareActiveMonthTag">NOV26</span>)</h3>
+              <div id="analyticsPaymentBreakdown" class="grid grid-cols-2 gap-2"></div>
+            </div>
+
+            <!-- Category Matrix Across Selected Months -->
+            <div class="pt-1 space-y-2">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider">Category Breakdown</h3>
+              <div id="analyticsCategoryDeltaList" class="space-y-2"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================== -->
+        <!-- TAB 3: OTHER (NOTHING OS NOTEPAD, GOALS, CATEGORIES)   -->
+        <!-- ====================================================== -->
+        <section id="view-tools" class="hidden space-y-4">
+          
+          <!-- Sub-Navigation Pill Strip -->
+          <div class="flex gap-1.5 overflow-x-auto pb-1">
+            <button onclick="switchToolSubTab('notepad')" id="subtab-notepad" class="px-3.5 py-2 rounded-xl text-xs font-extrabold app-gradient-btn shrink-0">📝 Quick Memos</button>
+            <button onclick="switchToolSubTab('piggy')" id="subtab-piggy" class="px-3.5 py-2 rounded-xl text-xs font-extrabold app-elevated shrink-0">🎯 Goals</button>
+            <button onclick="switchToolSubTab('categories')" id="subtab-categories" class="px-3.5 py-2 rounded-xl text-xs font-extrabold app-elevated shrink-0">⇅ Categories & Pay</button>
+          </div>
+
+          <!-- SUB-TAB A: MODERN GLASSMORPHIC FINANCIAL MEMO PAD -->
+          <div id="tool-panel-notepad" class="space-y-3.5">
+            <div class="app-card rounded-3xl p-4 space-y-3.5 shadow-xl">
+              
+              <!-- Header + New Note Action -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-extrabold flex items-center gap-1.5">
+                    <span>📝</span>
+                    <span>Financial Memo Pad</span>
+                  </h3>
+                  <p class="text-[10.5px] app-muted">Jot down bill reminders, shopping lists & lending notes</p>
+                </div>
+                <button onclick="addNothingNote()" class="px-3.5 py-2 rounded-xl app-gradient-btn text-xs font-extrabold shadow-md active:scale-95 transition">
+                  + New Memo
+                </button>
+              </div>
+
+              <!-- Horizontal Saved Memo Pills / Cards -->
+              <div id="nothingNotesGrid" class="flex gap-2 overflow-x-auto pb-1"></div>
+
+              <!-- Active Memo Editor Card -->
+              <div class="memo-paper rounded-2xl p-3.5 space-y-2.5">
+                <div class="flex items-center justify-between gap-2 border-b border-[#194234] pb-2">
+                  <input id="nothingNoteTitle" type="text" placeholder="Memo Title (e.g. Nov Shopping, Pending Dues)..."
+                         class="w-full bg-transparent text-xs font-extrabold text-white outline-none placeholder-[#8AA399]/60" />
+                  <span id="nothingNoteTimestamp" class="text-[9.5px] font-mono px-2 py-0.5 rounded-full app-elevated text-[#38BDF8] shrink-0">
+                    Auto-Saved
+                  </span>
+                </div>
+
+                <!-- Quick Formatting / Tag Toolbar -->
+                <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="insertMemoSnippet('☐ ')" class="px-2 py-1 rounded-lg app-elevated text-[10px] font-bold hover:border-[#38BDF8] transition">
+                      ☑ Checklist
+                    </button>
+                    <button type="button" onclick="insertMemoSnippet('• ')" class="px-2 py-1 rounded-lg app-elevated text-[10px] font-bold hover:border-[#38BDF8] transition">
+                      • Bullet
+                    </button>
+                    <button type="button" onclick="insertMemoSnippet('₹')" class="px-2 py-1 rounded-lg app-elevated text-[10px] font-mono font-bold text-[#38BDF8] hover:border-[#38BDF8] transition">
+                      + ₹ Symbol
+                    </button>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="setMemoTag('📌 Pinned')" class="px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 text-[9.5px] font-bold">📌 Pin</button>
+                    <button type="button" onclick="setMemoTag('🧾 Bill')" class="px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-400 text-[9.5px] font-bold">🧾 Bill</button>
+                    <button type="button" onclick="setMemoTag('🛒 List')" class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 text-[9.5px] font-bold">🛒 List</button>
+                  </div>
+                </div>
+
+                <!-- Ruled Note Textarea -->
+                <textarea id="nothingNoteBody" rows="5" oninput="saveCurrentNothingNote()"
+                          placeholder="Write your budget notes, people who owe you money, or grocery items here..."
+                          class="memo-ruled w-full bg-transparent text-xs text-white/95 outline-none resize-none font-medium"></textarea>
+
+                <!-- Footer Bar -->
+                <div class="flex items-center justify-between pt-1.5 border-t border-[#194234]/70 text-[10px] app-muted">
+                  <span id="memoCharCount" class="font-mono">0 chars</span>
+                  <div class="flex items-center gap-3">
+                    <button type="button" onclick="copyCurrentMemo()" class="text-[#38BDF8] font-bold hover:underline">📋 Copy</button>
+                    <button type="button" onclick="clearNothingNote()" class="text-rose-400 font-bold hover:underline">🗑 Clear</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- SUB-TAB B: GOALS -->
+          <div id="tool-panel-piggy" class="hidden app-card rounded-3xl p-4 space-y-3.5 shadow-lg">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-extrabold">🎯 Goals</h3>
+              <span class="text-[10px] font-mono app-muted">Target Progress</span>
+            </div>
+
+            <div id="piggyGoalsList" class="space-y-3"></div>
+
+            <!-- Create New Goal -->
+            <div class="p-3 rounded-2xl app-elevated space-y-2.5">
+              <div class="text-xs font-bold text-emerald-400">+ New Goal</div>
+              <div class="grid grid-cols-2 gap-2">
+                <input id="piggyTitleInput" type="text" placeholder="Goal Name" class="bg-[#04120E] border border-[#194234] rounded-xl px-3 py-2 text-xs outline-none" />
+                <input id="piggyTargetInput" type="number" placeholder="Target Amount" class="bg-[#04120E] border border-[#194234] rounded-xl px-3 py-2 text-xs font-mono outline-none" />
+              </div>
+              <button onclick="createNewPiggyGoal()" class="w-full py-2.5 rounded-xl app-gradient-btn font-extrabold text-xs">
+                + Add Goal
+              </button>
+            </div>
+          </div>
+
+          <!-- SUB-TAB C: CUSTOM & REARRANGEABLE CATEGORIES + PAYMENT TYPES -->
+          <div id="tool-panel-categories" class="hidden space-y-4">
+            <div class="app-card rounded-3xl p-4 space-y-3">
+              <h3 class="text-sm font-extrabold">⇅ Rearrange & Add Categories</h3>
+              <div class="flex gap-2">
+                <input id="newCategoryInput" type="text" placeholder="New Category name..." class="flex-1 bg-[#04120E] border border-[#194234] rounded-xl px-3 py-2 text-xs outline-none" />
+                <select id="newCategoryType" class="bg-[#04120E] border border-[#194234] rounded-xl px-2 text-xs">
+                  <option value="expense">Expense</option>
+                  <option value="income">Income</option>
+                </select>
+                <button onclick="addCustomCategory()" class="px-3.5 py-2 rounded-xl app-gradient-btn font-extrabold text-xs">+ Add</button>
+              </div>
+              <div id="manageCategoriesList" class="space-y-1.5 max-h-[220px] overflow-y-auto"></div>
+            </div>
+
+            <div class="app-card rounded-3xl p-4 space-y-3">
+              <h3 class="text-sm font-extrabold">💳 Rearrange & Add Payment Methods</h3>
+              <div class="flex gap-2">
+                <input id="newPaymentInput" type="text" placeholder="e.g. RuPay UPI, Wallet..." class="flex-1 bg-[#04120E] border border-[#194234] rounded-xl px-3 py-2 text-xs outline-none" />
+                <button onclick="addCustomPaymentMethod()" class="px-3.5 py-2 rounded-xl app-gradient-btn font-extrabold text-xs">+ Add</button>
+              </div>
+              <div id="managePaymentsList" class="space-y-1.5"></div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ====================================================== -->
+        <!-- TAB 4: SETTINGS (THEMES, BATTERY/HZ, EXCEL, STATEMENT) -->
+        <!-- ====================================================== -->
+        <section id="view-settings" class="hidden space-y-4">
+
+          <!-- ANDROID PERMISSIONS & DAILY REMINDER ENGINE CARD -->
+          <div class="app-card rounded-3xl p-4 space-y-3 shadow-lg border border-[#38BDF8]/30">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-extrabold flex items-center gap-1.5">
+                  <span>🛡️</span>
+                  <span>App Permissions & Daily Check</span>
+                </h3>
+                <p id="settingsPermSummaryText" class="text-[10.5px] app-muted">If denied, app asks once every 24 hours</p>
+              </div>
+              <button onclick="openPermissionModal(true)" class="px-3 py-1.5 rounded-xl app-gradient-btn text-[11px] font-extrabold">
+                Manage
+              </button>
+            </div>
+            <div id="settingsPermissionStatusList" class="space-y-1.5"></div>
+            <div class="flex items-center justify-between pt-2 border-t border-[#194234] text-[10px] font-mono app-muted">
+              <span id="nextDailyPromptClock">Daily Prompt: Active</span>
+              <button onclick="simulateNextDayPermissionCheck()" class="text-[#38BDF8] font-bold underline">
+                ⏩ Simulate Next Day (24h Passed)
+              </button>
+            </div>
+          </div>
+          
+          <!-- Color Psychology Theme Picker -->
+          <div class="app-card rounded-3xl p-4 space-y-3 shadow-lg">
+            <div>
+              <h3 class="text-sm font-extrabold">🎨 Fintech Color Psychology Theme</h3>
+              <p class="text-[11px] app-muted">Emerald + Blue reduces financial stress & boosts clarity</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="applyTheme('emerald')" class="p-2.5 rounded-2xl app-elevated text-left border-2 border-[#10B981]">
+                <div class="text-xs font-extrabold text-emerald-400">🌿 Blue & Emerald</div>
+                <div class="text-[10px] app-muted">Wealth & Clarity (Default)</div>
+              </button>
+              <button onclick="applyTheme('ocean')" class="p-2.5 rounded-2xl app-elevated text-left">
+                <div class="text-xs font-extrabold text-sky-400">🌊 Ocean Blue</div>
+                <div class="text-[10px] app-muted">Deep Banking Trust</div>
+              </button>
+              <button onclick="applyTheme('oled')" class="p-2.5 rounded-2xl app-elevated text-left">
+                <div class="text-xs font-extrabold text-white">🖤 Pure OLED B&W</div>
+                <div class="text-[10px] app-muted">Zero Power AMOLED</div>
+              </button>
+              <button onclick="applyTheme('paper')" class="p-2.5 rounded-2xl app-elevated text-left">
+                <div class="text-xs font-extrabold text-amber-500">📄 Warm Paper</div>
+                <div class="text-[10px] app-muted">Daylight Ledger</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Display Refresh Rate (120Hz/90Hz) & Battery Saver for Older Phones -->
+          <div class="app-card rounded-3xl p-4 space-y-3 shadow-lg">
+            <div>
+              <h3 class="text-sm font-extrabold">⚡ Display (90Hz/120Hz) & Battery Optimization</h3>
+              <p class="text-[11px] app-muted">Optimize for POCO X6 Pro 120Hz or older Android phones</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="setPerformanceMode('120hz')" id="perf-120hz" class="p-2.5 rounded-2xl app-gradient-btn text-center">
+                <div class="text-xs font-extrabold">🚀 120Hz / 90Hz</div>
+                <div class="text-[9.5px] opacity-80">Ultra Smooth GPU</div>
+              </button>
+              <button onclick="setPerformanceMode('60hz')" id="perf-60hz" class="p-2.5 rounded-2xl app-elevated text-center">
+                <div class="text-xs font-extrabold">⚖️ 60Hz Standard</div>
+                <div class="text-[9.5px] app-muted">Balanced</div>
+              </button>
+              <button onclick="setPerformanceMode('saver')" id="perf-saver" class="p-2.5 rounded-2xl app-elevated text-center">
+                <div class="text-xs font-extrabold">🔋 Battery Saver</div>
+                <div class="text-[9.5px] app-muted">For Older Phones</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Currency & Biometric Fingerprint Lock -->
+          <div class="app-card rounded-3xl p-4 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-extrabold">💱 Currency Symbol</div>
+                <div class="text-[10px] app-muted">Updates all tabs & Dynamic Island</div>
+              </div>
+              <select id="currencySelect" onchange="changeCurrency(this.value)" class="app-elevated px-3 py-1.5 rounded-xl text-xs font-mono font-bold outline-none">
+                <option value="₹">₹ INR</option>
+                <option value="$">$ USD</option>
+                <option value="€">€ EUR</option>
+                <option value="£">£ GBP</option>
+                <option value="د.إ">AED</option>
+              </select>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-[#194234]">
+              <div>
+                <div class="text-xs font-extrabold">🔐 Biometric Fingerprint / Face Lock</div>
+                <div class="text-[10px] app-muted">Protect app when opened</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="lockAppNow()" class="px-2.5 py-1 rounded-lg app-elevated text-[10px] font-bold text-[#38BDF8]">Test Lock</button>
+                <input id="biometricToggle" type="checkbox" onchange="toggleBiometricSetting(this.checked)" class="w-4 h-4 accent-[#10B981]" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-Tab Excel (.xlsx) Backup & Restore -->
+          <div class="app-card rounded-3xl p-4 space-y-3 shadow-lg">
+            <div>
+              <h3 class="text-sm font-extrabold">📊 Excel (.xlsx) Backup & Restore</h3>
+              <p class="text-[11px] app-muted">Full multi-sheet workbook (`NOV26`, `OCT26`, `SEP26`, `AUG26`)</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <button onclick="exportToExcelWorkbook()" class="py-3 px-3 rounded-2xl app-gradient-btn font-extrabold text-xs flex items-center justify-center gap-1.5 shadow">
+                <span>⬇</span>
+                <span>Export Excel (.xlsx)</span>
+              </button>
+              <label class="py-3 px-3 rounded-2xl app-elevated font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer text-center hover:border-[#38BDF8]">
+                <span>⬆</span>
+                <span>Restore Excel</span>
+                <input type="file" accept=".xlsx,.xls" onchange="importFromExcelWorkbook(event)" class="hidden" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Automatic GPay / PhonePe / Bank Statement Importer -->
+          <div class="app-card rounded-3xl p-4 space-y-3 shadow-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-extrabold">📄 Automatic UPI Statement Importer</h3>
+                <p class="text-[11px] app-muted">Upload CSV/Excel or paste GPay/PhonePe statement lines to review & confirm</p>
+              </div>
+              <button onclick="loadSampleUpiStatement()" class="text-[10px] font-mono font-bold text-[#38BDF8] underline shrink-0">Load Sample</button>
+            </div>
+            <textarea id="statementRawInput" rows="3" placeholder="Paste statement lines or upload CSV (e.g. 05-Nov, Paid ₹180 to Zomato via UPI Lite)..."
+                      class="w-full bg-[#04120E] border border-[#194234] rounded-2xl p-2.5 text-xs font-mono outline-none"></textarea>
+            <button onclick="parseStatementCandidates()" class="w-full py-2.5 rounded-xl app-elevated font-extrabold text-xs text-[#38BDF8] hover:border-[#38BDF8]">
+              🔍 Detect Transactions for Confirmation
+            </button>
+            <div id="statementCandidatesContainer" class="hidden space-y-2 pt-2"></div>
+          </div>
+
+        </section>
+
+      </main>
+
+      <!-- BOTTOM NAVIGATION BAR -->
+      <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[445px] app-card border-t border-[#194234] px-2 py-2 flex items-center justify-around z-40 shadow-2xl">
+        <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center gap-0.5 py-1 px-4 rounded-2xl font-extrabold text-[#38BDF8]">
+          <span class="text-sm">🏠</span>
+          <span class="text-[10px]">Home</span>
+        </button>
+        <button onclick="switchTab('analytics')" id="nav-analytics" class="flex flex-col items-center gap-0.5 py-1 px-4 rounded-2xl app-muted">
+          <span class="text-sm">📊</span>
+          <span class="text-[10px]">Compare</span>
+        </button>
+        <button onclick="switchTab('tools')" id="nav-tools" class="flex flex-col items-center gap-0.5 py-1 px-4 rounded-2xl app-muted">
+          <span class="text-sm">🛠️</span>
+          <span class="text-[10px]">Other Tools</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="flex flex-col items-center gap-0.5 py-1 px-4 rounded-2xl app-muted">
+          <span class="text-sm">⚙️</span>
+          <span class="text-[10px]">Settings</span>
+        </button>
+      </nav>
+
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- DYNAMIC ADD / EDIT ENTRY MODAL (COMPACT OR FULL-SCREEN)    -->
+    <!-- ========================================================== -->
+    <div id="addEntryModalOverlay" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center">
+      <div id="addEntrySheet" class="gpu-smooth app-card w-full max-w-[445px] rounded-t-3xl sm:rounded-3xl p-4 flex flex-col max-h-[92vh] overflow-y-auto shadow-2xl">
+        
+        <!-- Modal Top Header with Dynamic Compact / Full-Screen Toggle -->
+        <div class="flex items-center justify-between pb-3 border-b border-[#194234]">
+          <div class="flex items-center gap-2.5">
+            <div id="modalMascotIcon" class="w-10 h-10 rounded-xl app-elevated p-1 shrink-0"></div>
+            <div>
+              <h3 id="modalTitleText" class="text-sm font-extrabold">Add Transaction</h3>
+              <p id="modalSubText" class="text-[10px] text-[#38BDF8] font-medium">Penny is watching your entry...</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button type="button" id="modalSizeToggleBtn" onclick="toggleEntryModalSize()"
+                    class="px-2.5 py-1 rounded-xl app-elevated text-[10px] font-mono font-bold text-[#38BDF8]">
+              ⛶ Full Screen
+            </button>
+            <button type="button" onclick="closeAddEntryModal()" class="p-1.5 rounded-xl app-elevated text-xs">✕</button>
+          </div>
+        </div>
+
+        <div class="space-y-3 py-3 flex-1 overflow-y-auto">
+          <!-- Expense (-) vs Salary / Income (+) Toggle -->
+          <div class="grid grid-cols-2 gap-1.5 p-1 rounded-xl bg-[#04120E] border border-[#194234]">
+            <button type="button" id="modalBtnExp" onclick="setModalType('expense')" class="py-2 rounded-lg text-xs font-extrabold app-gradient-btn">
+              💸 Expense (OUT)
+            </button>
+            <button type="button" id="modalBtnInc" onclick="setModalType('income')" class="py-2 rounded-lg text-xs font-extrabold app-muted">
+              💰 Salary / Income (+)
+            </button>
+          </div>
+
+          <!-- Amount Input & Standard Calendar Date Picker Button -->
+          <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-7 relative">
+              <span class="curr-symbol absolute left-3 top-1/2 -translate-y-1/2 text-sm font-mono font-bold text-[#38BDF8]">₹</span>
+              <input id="modalAmountInput" type="text" inputmode="decimal" oninput="syncAmountFromInput(this.value)" placeholder="0"
+                     class="w-full bg-[#04120E] border border-[#194234] focus:border-[#38BDF8] rounded-xl py-2.5 pl-7 pr-3 text-base font-mono font-extrabold text-white outline-none" />
+            </div>
+            <div class="col-span-5">
+              <button type="button" onclick="openCalendarModal('modal')"
+                      class="w-full h-full bg-[#04120E] border border-[#194234] hover:border-[#38BDF8] rounded-xl px-2.5 py-2.5 text-xs font-mono font-bold text-white flex items-center justify-between">
+                <span>📅</span>
+                <span id="modalDateDisplay">8-Nov</span>
+                <span class="text-[9px] text-[#38BDF8]">▼</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CUSTOM MATH KEYBOARD (+, -, ×, ÷) — SHOWN ONLY IN FULL-SCREEN MODE -->
+          <div id="fullScreenMathKeyboard" class="hidden p-2.5 rounded-2xl bg-[#04120E] border border-[#194234] space-y-2">
+            <div class="flex justify-between items-center text-[10px] font-mono">
+              <span class="text-[#8AA399]">🧮 Full-Screen Math Pad (+, -, ×, ÷)</span>
+              <span id="mathExprPreview" class="text-[#38BDF8] font-bold">0</span>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5 font-mono text-xs font-extrabold">
+              <button type="button" onclick="mathKey('C')" class="py-2 rounded-xl bg-rose-500/20 text-rose-400">C</button>
+              <button type="button" onclick="mathKey('+')" class="py-2 rounded-xl app-elevated text-[#38BDF8]">+ Add</button>
+              <button type="button" onclick="mathKey('-')" class="py-2 rounded-xl app-elevated text-[#38BDF8]">- Minus</button>
+              <button type="button" onclick="mathKey('BACK')" class="py-2 rounded-xl app-elevated">⌫</button>
+
+              <button type="button" onclick="mathKey('7')" class="py-2 rounded-xl app-elevated">7</button>
+              <button type="button" onclick="mathKey('8')" class="py-2 rounded-xl app-elevated">8</button>
+              <button type="button" onclick="mathKey('9')" class="py-2 rounded-xl app-elevated">9</button>
+              <button type="button" onclick="mathKey('*')" class="py-2 rounded-xl app-elevated text-[#38BDF8]">×</button>
+
+              <button type="button" onclick="mathKey('4')" class="py-2 rounded-xl app-elevated">4</button>
+              <button type="button" onclick="mathKey('5')" class="py-2 rounded-xl app-elevated">5</button>
+              <button type="button" onclick="mathKey('6')" class="py-2 rounded-xl app-elevated">6</button>
+              <button type="button" onclick="mathKey('/')" class="py-2 rounded-xl app-elevated text-[#38BDF8]">÷</button>
+
+              <button type="button" onclick="mathKey('1')" class="py-2 rounded-xl app-elevated">1</button>
+              <button type="button" onclick="mathKey('2')" class="py-2 rounded-xl app-elevated">2</button>
+              <button type="button" onclick="mathKey('3')" class="py-2 rounded-xl app-elevated">3</button>
+              <button type="button" onclick="mathKey('=')" class="py-2 rounded-xl app-gradient-btn row-span-2 flex items-center justify-center">=</button>
+
+              <button type="button" onclick="mathKey('0')" class="py-2 rounded-xl app-elevated col-span-2">0</button>
+              <button type="button" onclick="mathKey('.')" class="py-2 rounded-xl app-elevated">.</button>
+            </div>
+          </div>
+
+          <!-- Payment Method Chips -->
+          <div>
+            <label class="text-[10px] font-mono uppercase app-muted block mb-1">Payment Method</label>
+            <div id="modalPaymentChips" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- Category Chips -->
+          <div>
+            <label class="text-[10px] font-mono uppercase app-muted block mb-1">Category</label>
+            <div id="modalCategoryChips" class="flex flex-wrap gap-1.5 max-h-[115px] overflow-y-auto"></div>
+          </div>
+
+          <!-- Description / Merchant -->
+          <div>
+            <label class="text-[10px] font-mono uppercase app-muted block mb-1">Description / Note</label>
+            <input id="modalDescInput" type="text" placeholder="e.g. Biryani order, Monthly Salary, Petrol..."
+                   class="w-full bg-[#04120E] border border-[#194234] rounded-xl px-3.5 py-2.5 text-xs text-white outline-none focus:border-[#38BDF8]" />
+          </div>
+
+          <!-- RECURRING TRANSACTION OPTION DIRECTLY INSIDE ENTRY MODAL -->
+          <div class="p-3 rounded-2xl bg-[#04120E] border border-[#194234] space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="modalRecurringCheck" type="checkbox" onchange="toggleModalRecurringUI()" class="w-4 h-4 accent-[#10B981]" />
+                <span class="text-xs font-extrabold">🔁 Repeat Monthly (Recurring)</span>
+              </label>
+              <div id="modalRecurringDayBox" class="hidden flex items-center gap-1 text-[10px] font-mono">
+                <span class="app-muted">Every Day:</span>
+                <input id="modalRecurringDayInput" type="number" min="1" max="31" value="5" class="w-12 bg-[#091E17] border border-[#194234] rounded-lg px-1.5 py-0.5 text-center text-white font-bold" />
+              </div>
+            </div>
+
+            <!-- Saved Recurring Templates Quick-Log Strip -->
+            <div class="pt-1 border-t border-[#194234]/60">
+              <div class="flex items-center justify-between text-[10px] app-muted mb-1.5">
+                <span>SAVED RECURRING ITEMS (1-TAP FILL)</span>
+                <button type="button" onclick="runDueRecurringNow()" class="text-[#38BDF8] font-mono font-bold hover:underline">⚡ Log All</button>
+              </div>
+              <div id="modalRecurringQuickList" class="flex gap-1.5 overflow-x-auto pb-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onclick="saveModalTransaction()" class="w-full py-3 rounded-2xl app-gradient-btn font-extrabold text-xs shadow-lg">
+          ✓ Save Transaction
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- STANDARD CALENDAR DATE PICKER MODAL                        -->
+    <!-- ========================================================== -->
+    <div id="calendarModalOverlay" class="fixed inset-0 z-[70] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="app-card w-full max-w-[340px] rounded-3xl p-4 space-y-3 shadow-2xl border border-[#38BDF8]/40">
+        <div class="flex items-center justify-between border-b border-[#194234] pb-2.5">
+          <span class="text-xs font-extrabold text-[#38BDF8]">📅 Select Transaction Date</span>
+          <button onclick="closeCalendarModal()" class="p-1 rounded-lg app-elevated text-xs">✕</button>
+        </div>
+
+        <!-- Month & Year Dropdowns -->
+        <div class="grid grid-cols-2 gap-2">
+          <select id="calMonthSelect" onchange="renderCalendarGrid()" class="app-elevated rounded-xl px-2.5 py-2 text-xs font-bold outline-none">
+            <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+            <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+            <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+            <option value="9">October</option><option value="10" selected>November</option><option value="11">December</option>
+          </select>
+          <select id="calYearSelect" onchange="renderCalendarGrid()" class="app-elevated rounded-xl px-2.5 py-2 text-xs font-mono font-bold outline-none">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+
+        <!-- Weekday Headers -->
+        <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-mono app-muted pt-1">
+          <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+        </div>
+
+        <!-- Days Grid -->
+        <div id="calendarDaysContainer" class="grid grid-cols-7 gap-1 text-center text-xs font-mono"></div>
+
+        <div class="flex justify-between pt-2 border-t border-[#194234]">
+          <button onclick="selectTodayCalendar()" class="px-3 py-1.5 rounded-xl app-elevated text-xs font-bold text-[#38BDF8]">Today (8-Nov)</button>
+          <button onclick="closeCalendarModal()" class="px-4 py-1.5 rounded-xl app-gradient-btn text-xs font-extrabold">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- RECEIPT SCANNER (OCR) MODAL                                -->
+    <!-- ========================================================== -->
+    <div id="receiptScannerModal" class="fixed inset-0 z-[65] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="app-card w-full max-w-[395px] rounded-3xl p-5 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-extrabold">🧾 Smart Receipt Scanner (OCR)</h3>
+            <p class="text-[10px] app-muted">Snap a bill or test with realistic sample receipts</p>
+          </div>
+          <button onclick="closeReceiptScannerModal()" class="p-1.5 rounded-xl app-elevated">✕</button>
+        </div>
+
+        <!-- Scanner Viewport with Laser Line -->
+        <div class="relative h-36 rounded-2xl bg-[#030D0A] border-2 border-dashed border-[#38BDF8]/50 flex flex-col items-center justify-center overflow-hidden">
+          <div id="ocrLaserLine" class="ocr-laser absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#38BDF8] to-transparent shadow-[0_0_12px_#38BDF8]"></div>
+          <label class="cursor-pointer text-center p-4">
+            <div class="text-2xl mb-1">📷</div>
+            <div class="text-xs font-extrabold text-[#38BDF8]">Tap to Capture / Upload Receipt Photo</div>
+            <div class="text-[10px] app-muted mt-0.5">Extracts Total Amount, Date & Category</div>
+            <input type="file" accept="image/*" onchange="handleReceiptImageUpload(event)" class="hidden" />
+          </label>
+        </div>
+
+        <!-- Instant Sample Receipt Presets for Testing -->
+        <div class="space-y-1.5">
+          <div class="text-[10px] font-mono uppercase app-muted">Or Test Instant OCR Presets:</div>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="simulateReceiptOcr('BPCL Petrol Slip', 350, 'Petrol', 'UPI Lite')" class="p-2 rounded-xl app-elevated text-left hover:border-[#38BDF8]">
+              <div class="text-[11px] font-bold text-[#38BDF8]">⛽ Petrol Slip</div>
+              <div class="text-[10px] font-mono">₹350.00</div>
+            </button>
+            <button onclick="simulateReceiptOcr('Shalimar Dum Biryani', 280, 'Food', 'UPI Lite')" class="p-2 rounded-xl app-elevated text-left hover:border-[#38BDF8]">
+              <div class="text-[11px] font-bold text-emerald-400">🍛 Restaurant</div>
+              <div class="text-[10px] font-mono">₹280.00</div>
+            </button>
+            <button onclick="simulateReceiptOcr('DMart Grocery Mart', 1420, 'Shopping', 'Bank')" class="p-2 rounded-xl app-elevated text-left hover:border-[#38BDF8]">
+              <div class="text-[11px] font-bold text-amber-400">🛒 Grocery</div>
+              <div class="text-[10px] font-mono">₹1,420.00</div>
+            </button>
+          </div>
+        </div>
+
+        <div id="ocrExtractedPreview" class="hidden p-3 rounded-2xl app-elevated space-y-2 border border-[#10B981]">
+          <div class="flex justify-between text-xs">
+            <span class="app-muted">Merchant:</span>
+            <span id="ocrMerchantText" class="font-bold text-white"></span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="app-muted">Detected Total:</span>
+            <span id="ocrAmountText" class="font-mono font-extrabold text-[#38BDF8]"></span>
+          </div>
+          <button onclick="confirmOcrToEntryModal()" class="w-full py-2 rounded-xl app-gradient-btn font-extrabold text-xs">
+            ✓ Auto-Fill Expense Entry
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- SHAREABLE VISUAL MONTHLY / COMPARE CARD MODAL              -->
+    <!-- ========================================================== -->
+    <div id="shareCardModal" class="fixed inset-0 z-[65] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="app-card w-full max-w-[380px] rounded-3xl p-5 space-y-4 shadow-2xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-extrabold">📤 Share Visual Budget Summary</h3>
+          <button onclick="closeShareCardModal()" class="p-1.5 rounded-xl app-elevated">✕</button>
+        </div>
+
+        <div id="shareVisualSnapshot" class="p-5 rounded-3xl bg-gradient-to-br from-[#041E16] via-[#07271E] to-[#062030] border border-[#38BDF8]/40 space-y-3 text-white shadow-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div id="shareCardMascot" class="w-9 h-9"></div>
+              <div>
+                <div class="text-xs font-extrabold">Simple Budget Report</div>
+                <div id="shareCardSubtitle" class="text-[10px] text-[#38BDF8] font-mono">NOV26 SUMMARY</div>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10">Verified</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+            <div class="p-2 rounded-2xl bg-black/30">
+              <div class="text-[9px] text-gray-300">SPENT</div>
+              <div id="shareCardSpent" class="text-xs font-mono font-extrabold text-rose-400">₹0</div>
+            </div>
+            <div class="p-2 rounded-2xl bg-black/30">
+              <div class="text-[9px] text-gray-300">EARNED</div>
+              <div id="shareCardEarned" class="text-xs font-mono font-extrabold text-emerald-400">₹0</div>
+            </div>
+            <div class="p-2 rounded-2xl bg-black/30">
+              <div class="text-[9px] text-gray-300">SAVED</div>
+              <div id="shareCardNet" class="text-xs font-mono font-extrabold text-[#38BDF8]">₹0</div>
+            </div>
+          </div>
+          <div id="shareCardTopCats" class="text-[10px] font-mono text-gray-300 pt-1"></div>
+        </div>
+
+        <button onclick="copyShareSummaryText()" class="w-full py-3 rounded-2xl app-gradient-btn font-extrabold text-xs">
+          📋 Copy Summary for WhatsApp / Share
+        </button>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toastBox" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-[80] hidden px-4 py-2.5 rounded-2xl app-gradient-btn font-extrabold text-xs shadow-2xl">
+      <span id="toastMessage">Saved!</span>
+    </div>
+
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- COMPLETE APPLICATION LOGIC                                   -->
+  <!-- ============================================================ -->
+  <script>
+    const MONTH_NAMES_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const ALL_MONTH_KEYS = ['NOV26', 'OCT26', 'SEP26', 'AUG26'];
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000; // 24 Hours in milliseconds
+
+    const PERMISSION_META = [
+      {
+        key: 'notifications',
+        icon: '🔔',
+        title: 'UPI & Salary Notifications',
+        desc: 'Detects GPay, PhonePe, Paytm & Bank Salary SMS in background',
+        requiredFor: 'Dynamic Island Auto-Trigger'
+      },
+      {
+        key: 'overlay',
+        icon: '🏝️',
+        title: 'Display Over Other Apps (Overlay)',
+        desc: 'Shows Penny in the Dynamic Island punch-hole pill over UPI apps',
+        requiredFor: 'Dynamic Island Pill'
+      },
+      {
+        key: 'camera',
+        icon: '📷',
+        title: 'Camera Access (Receipt OCR)',
+        desc: 'Captures paper bills & petrol slips to auto-read amounts',
+        requiredFor: 'OCR Receipt Scanner'
+      },
+      {
+        key: 'battery',
+        icon: '🔋',
+        title: 'Unrestricted Battery / Autostart',
+        desc: 'Prevents HyperOS / Android from killing UPI detection while locked',
+        requiredFor: '24/7 Background Reliability'
+      }
+    ];
+
+    let state = {
+      activeMonth: 'NOV26',
+      isBackgroundMode: false,
+      islandExpanded: false,
+      homeFeedMode: 'list', // 'list' | 'graphics'
+      compareSelectedMonths: ['NOV26', 'OCT26', 'SEP26', 'AUG26'],
+      currency: '₹',
+      theme: 'emerald',
+      perfMode: '120hz',
+      biometricEnabled: false,
+      modalFullScreen: true,
+      monthlyBudgetLimit: 15000,
+      editingTxId: null,
+      modalType: 'expense',
+      islandType: 'expense',
+      selectedCategory: 'Food',
+      selectedPayment: 'UPI Lite',
+      selectedDate: '8-Nov',
+      islandDate: '8-Nov',
+      calendarTarget: 'modal',
+      mathExpr: '',
+      mascotOverrideMood: null,
+
+      // Smart Permission Tracking with 24-Hour Daily Re-Prompt Timestamp
+      permissions: {
+        notifications: 'prompt', // 'granted' | 'denied' | 'prompt'
+        overlay: 'prompt',
+        camera: 'prompt',
+        battery: 'granted',
+        lastAskedTimestamp: 0
+      },
+
+      nothingNotes: [
+        { id: 'nn_1', title: 'Nov Bill Reminders', tag: '🧾 Bill', body: '☐ Keep UPI Lite under ₹2,500\n☐ Renew bike insurance on 15th\n• Collect ₹500 split from friend', updated: 'Pinned' },
+        { id: 'nn_2', title: 'Monthly Grocery & Cat', tag: '🛒 List', body: '☐ Dry cat food & litter pack\n☐ Peanut butter jar\n☐ 20L Aqua water jar', updated: 'Saved' }
+      ],
+      activeNothingNoteId: 'nn_1',
+
+      expenseCategories: [
+        'Food', 'Petrol', 'Water', 'Cat', 'Home', 'Transport',
+        'Perfume', 'Health', 'Shopping', 'Garage', 'Miscellaneous Expenses',
+        'Loan Repayment', 'Saving'
+      ],
+      incomeCategories: ['Salary', 'Other Income', 'Cashback / Bonus'],
+      paymentMethods: ['UPI Lite', 'Bank', 'Cash', 'Credit Card'],
+
+      recurringRules: [
+        { id: 'rec_1', title: 'Monthly Salary Credit', amount: 38500, type: 'income', category: 'Salary', paymentType: 'Bank', day: 1 },
+        { id: 'rec_2', title: 'Home WiFi Fiber', amount: 599, type: 'expense', category: 'Home', paymentType: 'UPI Lite', day: 5 },
+        { id: 'rec_3', title: 'Cat Food & Litter Pack', amount: 850, type: 'expense', category: 'Cat', paymentType: 'Bank', day: 10 }
+      ],
+
+      piggyGoals: [
+        { id: 'pig_1', title: 'Emergency Fund', target: 20000, saved: 8500 },
+        { id: 'pig_2', title: 'Weekend Bike Trip', target: 5000, saved: 2200 }
+      ],
+
+      sheets: {
+        NOV26: [
+          { id: 'tx_101', date: '1-Nov', paymentType: 'Bank', category: 'Salary', description: 'Monthly Salary Credited', expense: 0, income: 38500 },
+          { id: 'tx_102', date: '2-Nov', paymentType: 'UPI Lite', category: 'Food', description: 'New Shalimar Dum Biryani', expense: 260, income: 0 },
+          { id: 'tx_103', date: '4-Nov', paymentType: 'Bank', category: 'Petrol', description: 'BPCL Petrol Refuel', expense: 350, income: 0 },
+          { id: 'tx_104', date: '5-Nov', paymentType: 'UPI Lite', category: 'Water', description: 'Sai Aqua Jar Supply', expense: 120, income: 0 },
+          { id: 'tx_105', date: '6-Nov', paymentType: 'Bank', category: 'Cat', description: 'Dry Cat Food & Litter', expense: 680, income: 0 },
+          { id: 'tx_106', date: '7-Nov', paymentType: 'UPI Lite', category: 'Food', description: 'Peanut Butter & Breakfast', expense: 240, income: 0 }
+        ],
+        OCT26: [
+          { id: 'tx_201', date: '1-Oct', paymentType: 'Bank', category: 'Salary', description: 'October Salary', expense: 0, income: 38500 },
+          { id: 'tx_202', date: '5-Oct', paymentType: 'UPI Lite', category: 'Food', description: 'Biryani & Meals', expense: 1450, income: 0 },
+          { id: 'tx_203', date: '10-Oct', paymentType: 'Bank', category: 'Petrol', description: 'Commute Fuel', expense: 950, income: 0 },
+          { id: 'tx_204', date: '14-Oct', paymentType: 'Bank', category: 'Perfume', description: 'EDP Fragrance Decant', expense: 1200, income: 0 }
+        ],
+        SEP26: [
+          { id: 'tx_301', date: '1-Sep', paymentType: 'Bank', category: 'Salary', description: 'September Salary', expense: 0, income: 37000 },
+          { id: 'tx_302', date: '9-Sep', paymentType: 'UPI Lite', category: 'Food', description: 'Monthly Dining', expense: 1800, income: 0 }
+        ],
+        AUG26: [
+          { id: 'tx_401', date: '1-Aug', paymentType: 'Bank', category: 'Salary', description: 'August Salary', expense: 0, income: 37000 },
+          { id: 'tx_402', date: '12-Aug', paymentType: 'Cash', category: 'Home', description: 'Room Setup & Lamp', expense: 1100, income: 0 }
+        ]
+      }
+    };
+
+    let pendingOcrResult = null;
+    let statementCandidates = [];
+
+    // ==============================================================
+    // PENNY THE TUXEDO CAT SVG MASCOT ENGINE (ALL 5 MOODS)
+    // ==============================================================
+    function getPennyCatSvg(mood = 'CALM') {
+      const isWhistle = mood === 'WHISTLE';
+      const isWorried = mood === 'WORRIED';
+      const isShocked = mood === 'SHOCKED';
+      const isHappy = mood === 'HAPPY';
+
+      let eyesMarkup = '';
+      if (isWhistle) {
+        // Looking sideways whistling
+        eyesMarkup = `
+          <circle cx="34" cy="52" r="7.5" fill="#FFFFFF"/>
+          <circle cx="66" cy="52" r="7.5" fill="#FFFFFF"/>
+          <circle cx="38" cy="52" r="3.5" fill="#04120E"/>
+          <circle cx="70" cy="52" r="3.5" fill="#04120E"/>
+        `;
+      } else if (isWorried) {
+        // Worried angled brows + wide eyes
+        eyesMarkup = `
+          <ellipse cx="35" cy="53" rx="7" ry="8" fill="#FFFFFF"/>
+          <ellipse cx="65" cy="53" rx="7" ry="8" fill="#FFFFFF"/>
+          <circle cx="35" cy="54" r="3.2" fill="#04120E"/>
+          <circle cx="65" cy="54" r="3.2" fill="#04120E"/>
+          <line x1="25" y1="43" x2="42" y2="40" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+          <line x1="75" y1="43" x2="58" y2="40" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+        `;
+      } else if (isShocked) {
+        // Hollow shocked ring eyes
+        eyesMarkup = `
+          <circle cx="35" cy="52" r="8.5" fill="none" stroke="#FF453A" stroke-width="3.2"/>
+          <circle cx="65" cy="52" r="8.5" fill="none" stroke="#FF453A" stroke-width="3.2"/>
+          <circle cx="35" cy="52" r="2.5" fill="#FFFFFF"/>
+          <circle cx="65" cy="52" r="2.5" fill="#FFFFFF"/>
+        `;
+      } else if (isHappy) {
+        // Happy joyful arcs for Salary/Income
+        eyesMarkup = `
+          <path d="M 27 53 Q 35 43 43 53" fill="none" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 57 53 Q 65 43 73 53" fill="none" stroke="#10B981" stroke-width="4" stroke-linecap="round"/>
+        `;
+      } else {
+        // Calm geometric eyes
+        eyesMarkup = `
+          <rect x="27" y="47" width="15" height="9.5" rx="4.5" fill="#FFFFFF"/>
+          <rect x="58" y="47" width="15" height="9.5" rx="4.5" fill="#FFFFFF"/>
+        `;
+      }
+
+      const mouthMarkup = isWhistle
+        ? `<circle cx="54" cy="69" r="3.2" fill="#38BDF8"/>`
+        : isShocked
+          ? `<ellipse cx="50" cy="70" rx="4.5" ry="5.5" fill="#FF453A"/>`
+          : `<path d="M 43 68 Q 50 73 57 68" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>`;
+
+      const extrasMarkup = `
+        ${isWhistle ? `<text x="74" y="34" fill="#38BDF8" font-size="15" font-weight="bold" class="whistle-note-1">♪</text>
+                       <text x="84" y="24" fill="#10B981" font-size="13" font-weight="bold" class="whistle-note-2">♫</text>` : ''}
+        ${isWorried ? `<path d="M 79 38 C 79 38 84 46 84 49 A 3.5 3.5 0 1 1 75 49 C 75 46 79 38 79 38 Z" fill="#38BDF8" class="sweat-anim"/>` : ''}
+        ${isHappy ? `<text x="75" y="30" fill="#10B981" font-size="15" font-weight="bold">★</text>` : ''}
+      `;
+
+      return `
+        <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible">
+          <path d="M 18 15 L 36 28 L 64 28 L 82 15 L 86 62 Q 86 86 50 86 Q 14 86 14 62 Z"
+                fill="#050F0C" stroke="#FFFFFF" stroke-width="4.5" stroke-linejoin="round"/>
+          <polygon points="38,91 62,91 50,79" fill="#10B981"/>
+          ${eyesMarkup}
+          <polygon points="46,62 54,62 50,66" fill="#38BDF8"/>
+          ${mouthMarkup}
+          ${extrasMarkup}
+        </svg>
+      `;
+    }
+
+    function computeAutoMascotMood() {
+      if (state.mascotOverrideMood) return state.mascotOverrideMood;
+      const stats = getMonthStats(state.activeMonth);
+      const pct = state.monthlyBudgetLimit > 0 ? (stats.expense / state.monthlyBudgetLimit) * 100 : 0;
+      if (pct >= 100) return 'SHOCKED';
+      if (pct >= 75) return 'WORRIED';
+      return 'CALM';
+    }
+
+    function cycleMascotMood() {
+      const order = [null, 'CALM', 'WHISTLE', 'WORRIED', 'SHOCKED', 'HAPPY'];
+      const idx = order.indexOf(state.mascotOverrideMood);
+      state.mascotOverrideMood = order[(idx + 1) % order.length];
+      renderHeaderAndMascot();
+      const mood = computeAutoMascotMood();
+      showToast(`Penny Mood: ${mood}`);
+    }
+
+    function renderHeaderAndMascot() {
+      const mood = computeAutoMascotMood();
+      const headerBox = document.getElementById('headerMascotBox');
+      const badge = document.getElementById('mascotMoodBadge');
+      const line = document.getElementById('mascotStatusLine');
+      if (headerBox) headerBox.innerHTML = getPennyCatSvg(mood);
+      if (badge) badge.textContent = mood;
+
+      const messages = {
+        CALM: 'Penny: Spending is right on track!',
+        WHISTLE: 'Penny: Just logged a quick UPI entry ♪',
+        WORRIED: 'Penny: Sweating! Over 75% of monthly budget used 💧',
+        SHOCKED: 'Penny: Alert! Monthly budget limit exceeded!',
+        HAPPY: 'Penny: Purr-fect! Income / Salary added ★'
+      };
+      if (line) line.textContent = messages[mood] || messages.CALM;
+
+      const lockMascot = document.getElementById('lockScreenMascot');
+      if (lockMascot) lockMascot.innerHTML = getPennyCatSvg('CALM');
+      const permMascot = document.getElementById('permMascotBox');
+      if (permMascot) permMascot.innerHTML = getPennyCatSvg('WHISTLE');
+      const islandMini = document.getElementById('islandCatMini');
+      if (islandMini) islandMini.innerHTML = getPennyCatSvg(state.islandType === 'income' ? 'HAPPY' : 'WHISTLE');
+      const islandLarge = document.getElementById('islandCatLarge');
+      if (islandLarge) islandLarge.innerHTML = getPennyCatSvg(state.islandType === 'income' ? 'HAPPY' : 'WHISTLE');
+    }
+
+    // ==============================================================
+    // SMART PERMISSION ENGINE WITH 24-HOUR DAILY RE-PROMPT
+    // ==============================================================
+    function syncBrowserNotificationState() {
+      if ('Notification' in window) {
+        if (Notification.permission === 'granted') state.permissions.notifications = 'granted';
+      }
+    }
+
+    function getMissingPermissionsList() {
+      syncBrowserNotificationState();
+      return PERMISSION_META.filter(p => state.permissions[p.key] !== 'granted');
+    }
+
+    function checkDailyPermissionPrompt(forceOpen = false) {
+      const missing = getMissingPermissionsList();
+      renderPermissionBannerAndSettings();
+
+      if (missing.length === 0) {
+        document.getElementById('permissionPromptModal')?.classList.add('hidden');
+        return;
+      }
+
+      const now = Date.now();
+      const lastAsked = Number(state.permissions.lastAskedTimestamp || 0);
+      const elapsed = now - lastAsked;
+
+      // Ask immediately if never asked, or if 24 hours (1 day) have passed since denial/dismissal
+      if (forceOpen || elapsed >= ONE_DAY_MS) {
+        openPermissionModal(false);
+      }
+    }
+
+    function openPermissionModal(isManual) {
+      renderPermissionChecklistUI();
+      document.getElementById('permissionPromptModal')?.classList.remove('hidden');
+      if (!isManual) {
+        state.permissions.lastAskedTimestamp = Date.now();
+        saveState();
+      }
+    }
+
+    function dismissPermissionModalForToday() {
+      state.permissions.lastAskedTimestamp = Date.now();
+      // Mark any 'prompt' items as 'denied' so user knows they deferred them for 24h
+      PERMISSION_META.forEach(p => {
+        if (state.permissions[p.key] !== 'granted') {
+          state.permissions[p.key] = 'denied';
+        }
+      });
+      saveState();
+      document.getElementById('permissionPromptModal')?.classList.add('hidden');
+      renderPermissionBannerAndSettings();
+      showToast('Got it! Will remind you again in 24 hours (tomorrow).');
+    }
+
+    async function requestSinglePermission(key, actionState = 'granted') {
+      if (actionState === 'denied') {
+        state.permissions[key] = 'denied';
+        state.permissions.lastAskedTimestamp = Date.now();
+        saveState();
+        renderPermissionChecklistUI();
+        renderPermissionBannerAndSettings();
+        showToast(`${key.toUpperCase()} denied • Will ask again tomorrow (24h)`);
+        return false;
+      }
+
+      try {
+        if (key === 'notifications' && 'Notification' in window) {
+          const res = await Notification.requestPermission();
+          state.permissions.notifications = (res === 'granted' || res === 'default') ? 'granted' : 'denied';
+        } else if (key === 'camera' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            stream.getTracks().forEach(t => t.stop());
+            state.permissions.camera = 'granted';
+          } catch (camErr) {
+            // In iframe preview without hardware webcam, still allow simulated grant
+            state.permissions.camera = 'granted';
+          }
+        } else {
+          state.permissions[key] = 'granted';
+        }
+      } catch (e) {
+        state.permissions[key] = 'granted';
+      }
+
+      saveState();
+      renderPermissionChecklistUI();
+      renderPermissionBannerAndSettings();
+
+      if (getMissingPermissionsList().length === 0) {
+        setTimeout(() => {
+          document.getElementById('permissionPromptModal')?.classList.add('hidden');
+        }, 250);
+        showToast('All permissions granted! Dynamic Island & OCR ready ✓');
+      } else {
+        showToast(`${key.toUpperCase()} permission enabled ✓`);
+      }
+      return state.permissions[key] === 'granted';
+    }
+
+    async function grantAllMissingPermissions() {
+      for (const p of PERMISSION_META) {
+        state.permissions[p.key] = 'granted';
+      }
+      saveState();
+      renderPermissionChecklistUI();
+      renderPermissionBannerAndSettings();
+      document.getElementById('permissionPromptModal')?.classList.add('hidden');
+      showToast('All Android permissions enabled ✓');
+    }
+
+    function simulateNextDayPermissionCheck() {
+      // Rewind lastAskedTimestamp by 25 hours so the daily prompt fires immediately
+      state.permissions.lastAskedTimestamp = Date.now() - (ONE_DAY_MS + 3600000);
+      saveState();
+      const missing = getMissingPermissionsList();
+      if (missing.length === 0) {
+        // Temporarily set overlay to 'denied' so user can test the 24h prompt
+        state.permissions.overlay = 'denied';
+        saveState();
+      }
+      checkDailyPermissionPrompt(true);
+      showToast('Simulated +24 Hours: Daily permission check triggered!');
+    }
+
+    function renderPermissionChecklistUI() {
+      const box = document.getElementById('permissionChecklistContainer');
+      if (!box) return;
+
+      box.innerHTML = PERMISSION_META.map(p => {
+        const st = state.permissions[p.key];
+        const isGranted = st === 'granted';
+        const isDenied = st === 'denied';
+        return `
+          <div class="p-3 rounded-2xl app-elevated flex items-center justify-between gap-2 border ${isGranted ? 'border-emerald-500/40' : isDenied ? 'border-rose-500/40' : 'border-[#194234]'}">
+            <div class="flex items-start gap-2.5 min-w-0">
+              <span class="text-base mt-0.5">${p.icon}</span>
+              <div class="min-w-0">
+                <div class="text-xs font-extrabold flex items-center gap-1.5">
+                  <span class="truncate">${p.title}</span>
+                  <span class="text-[9px] font-mono px-1.5 py-0.5 rounded ${isGranted ? 'bg-emerald-500/20 text-emerald-400' : isDenied ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-300'}">
+                    ${isGranted ? 'ALLOWED' : isDenied ? 'DENIED (24H)' : 'REQUIRED'}
+                  </span>
+                </div>
+                <p class="text-[10px] app-muted mt-0.5">${p.desc}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              ${isGranted ? `
+                <button onclick="requestSinglePermission('${p.key}', 'denied')" class="px-2 py-1 rounded-lg bg-black/30 text-[10px] app-muted hover:text-rose-400">Revoke</button>
+              ` : `
+                <button onclick="requestSinglePermission('${p.key}', 'denied')" class="px-2 py-1.5 rounded-xl bg-rose-500/15 text-rose-400 text-[10px] font-bold">Deny</button>
+                <button onclick="requestSinglePermission('${p.key}', 'granted')" class="px-2.5 py-1.5 rounded-xl app-gradient-btn text-[10px] font-extrabold">Allow</button>
+              `}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPermissionBannerAndSettings() {
+      const missing = getMissingPermissionsList();
+      const banner = document.getElementById('missingPermBanner');
+      const bannerText = document.getElementById('missingPermBannerText');
+
+      if (banner) {
+        if (missing.length > 0) {
+          banner.classList.remove('hidden');
+          const names = missing.map(m => m.title.split(' ')[0]).join(', ');
+          if (bannerText) {
+            bannerText.textContent = `${missing.length} permission(s) off (${names}) • Daily reminder active`;
+          }
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
+
+      const settingsList = document.getElementById('settingsPermissionStatusList');
+      if (settingsList) {
+        settingsList.innerHTML = PERMISSION_META.map(p => {
+          const isGranted = state.permissions[p.key] === 'granted';
+          return `
+            <div class="p-2 rounded-xl app-elevated flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span>${p.icon}</span>
+                <span class="font-bold">${p.title}</span>
+              </div>
+              <button onclick="requestSinglePermission('${p.key}', '${isGranted ? 'denied' : 'granted'}')"
+                      class="px-2.5 py-1 rounded-lg font-mono text-[10px] font-extrabold ${isGranted ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}">
+                ${isGranted ? '✓ Allowed' : '✕ Denied (Tap to Allow)'}
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const nextClock = document.getElementById('nextDailyPromptClock');
+      if (nextClock) {
+        if (missing.length === 0) {
+          nextClock.textContent = 'All Permissions Active ✓';
+        } else if (state.permissions.lastAskedTimestamp) {
+          const hrsLeft = Math.max(1, Math.ceil((ONE_DAY_MS - (Date.now() - state.permissions.lastAskedTimestamp)) / 3600000));
+          nextClock.textContent = `Next Auto-Prompt in ~${hrsLeft}h`;
+        } else {
+          nextClock.textContent = 'Daily Prompt: Ready';
+        }
+      }
+    }
+
+    // ==============================================================
+    // CORE DASHBOARD, TRANSACTIONS & VISUAL GRAPHICS ENGINE
+    // ==============================================================
+    function getMonthStats(monthKey) {
+      const rows = state.sheets[monthKey] || [];
+      let expense = 0;
+      let income = 0;
+      const catExpense = {};
+      const catIncome = {};
+      const payTotals = {};
+
+      rows.forEach(r => {
+        const exp = Number(r.expense) || 0;
+        const inc = Number(r.income) || 0;
+        expense += exp;
+        income += inc;
+        if (exp > 0) {
+          catExpense[r.category] = (catExpense[r.category] || 0) + exp;
+          payTotals[r.paymentType] = (payTotals[r.paymentType] || 0) + exp;
+        }
+        if (inc > 0) {
+          catIncome[r.category] = (catIncome[r.category] || 0) + inc;
+        }
+      });
+
+      return {
+        rows,
+        expense,
+        income,
+        balance: income - expense,
+        catExpense,
+        catIncome,
+        payTotals
+      };
+    }
+
+    function toggleHomeFeedMode(mode) {
+      state.homeFeedMode = mode;
+      const listEl = document.getElementById('recentActivityList');
+      const graphEl = document.getElementById('homeVisualGraphicsPanel');
+      const btnList = document.getElementById('btnShowTxList');
+      const btnGraph = document.getElementById('btnShowVisuals');
+      const title = document.getElementById('homeMainFeedTitle');
+
+      const isList = mode === 'list';
+      if (listEl) listEl.classList.toggle('hidden', !isList);
+      if (graphEl) graphEl.classList.toggle('hidden', isList);
+      if (title) title.textContent = isList ? 'Transactions' : 'Visual Graphics';
+
+      if (btnList) btnList.className = isList ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold app-gradient-btn transition' : 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold app-muted transition';
+      if (btnGraph) btnGraph.className = !isList ? 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold app-gradient-btn transition' : 'px-2.5 py-1 rounded-lg text-[10px] font-extrabold app-muted transition';
+    }
+
+    function renderHomeDashboard() {
+      const stats = getMonthStats(state.activeMonth);
+      const cur = state.currency;
+
+      document.querySelectorAll('.curr-symbol').forEach(el => el.textContent = cur);
+      const mSelect = document.getElementById('activeMonthSelect');
+      if (mSelect) mSelect.value = state.activeMonth;
+
+      document.getElementById('monthHeaderLabel').textContent = `${state.activeMonth} LEDGER`;
+      document.getElementById('heroLeftBalance').textContent = `${cur}${stats.balance.toLocaleString('en-IN')}`;
+      document.getElementById('heroTotalExpense').textContent = `${cur}${stats.expense.toLocaleString('en-IN')}`;
+      document.getElementById('heroTotalIncome').textContent = `${cur}${stats.income.toLocaleString('en-IN')}`;
+
+      // Budget Target Bar
+      const limit = state.monthlyBudgetLimit || 15000;
+      const pct = Math.min(100, Math.round((stats.expense / limit) * 100));
+      const rem = limit - stats.expense;
+      document.getElementById('budgetTargetLabel').textContent = `${cur}${limit.toLocaleString('en-IN')}`;
+      const bar = document.getElementById('budgetProgressBar');
+      if (bar) {
+        bar.style.width = `${pct}%`;
+        bar.className = pct >= 100
+          ? 'h-full rounded-full transition-all duration-500 bg-rose-500'
+          : pct >= 75
+            ? 'h-full rounded-full transition-all duration-500 bg-amber-400'
+            : 'h-full rounded-full transition-all duration-500 bg-gradient-to-r from-[#38BDF8] to-[#10B981]';
+      }
+      document.getElementById('budgetPctText').textContent = `${pct}% used`;
+      document.getElementById('budgetRemainingText').textContent = rem >= 0
+        ? `${cur}${rem.toLocaleString('en-IN')} left`
+        : `${cur}${Math.abs(rem).toLocaleString('en-IN')} over limit!`;
+
+      // Transactions List with Working Edit (✎) & Delete (🗑)
+      const listEl = document.getElementById('recentActivityList');
+      document.getElementById('activityCountBadge').textContent = stats.rows.length;
+
+      if (stats.rows.length === 0) {
+        listEl.innerHTML = `<div class="p-8 text-center text-xs app-muted">No transactions in ${state.activeMonth} yet. Tap "+ Add Entry" above!</div>`;
+      } else {
+        listEl.innerHTML = stats.rows.map(tx => {
+          const isInc = Number(tx.income) > 0;
+          const val = isInc ? Number(tx.income) : Number(tx.expense);
+          return `
+            <div class="px-4 py-3 flex items-center justify-between gap-2 hover:bg-white/[0.02] transition">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-extrabold truncate">${tx.category}</span>
+                  <span class="text-[9.5px] font-mono px-1.5 py-0.5 rounded app-elevated text-[#38BDF8]">${tx.paymentType}</span>
+                  <span class="text-[10px] font-mono app-muted">${tx.date}</span>
+                </div>
+                <p class="text-[11px] app-muted truncate mt-0.5">${tx.description || tx.category}</p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="text-xs font-mono font-extrabold ${isInc ? 'text-emerald-400' : 'text-rose-400'}">
+                  ${isInc ? '+' : '-'}${cur}${val.toLocaleString('en-IN')}
+                </span>
+                <button onclick="openEditTransaction('${tx.id}')" title="Edit" class="p-1.5 rounded-lg app-elevated text-[11px] hover:border-[#38BDF8]">✎</button>
+                <button onclick="deleteTransaction('${tx.id}')" title="Delete" class="p-1.5 rounded-lg app-elevated text-[11px] text-rose-400 hover:border-rose-400">🗑</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Visual Graphics Panel (SVG Donut + Category Spend/Earn Bars)
+      renderHomeVisualGraphics(stats);
+      toggleHomeFeedMode(state.homeFeedMode);
+    }
+
+    function renderHomeVisualGraphics(stats) {
+      const cur = state.currency;
+      const donutBox = document.getElementById('homeDonutChartBox');
+      const legendBox = document.getElementById('homeDonutLegend');
+      const catList = document.getElementById('homeCategorySpendEarnList');
+      if (!donutBox || !legendBox || !catList) return;
+
+      const palette = ['#10B981', '#38BDF8', '#F59E0B', '#EC4899', '#A855F7', '#F43F5E'];
+      const entries = Object.entries(stats.catExpense).sort((a, b) => b[1] - a[1]);
+      const totalExp = stats.expense || 1;
+
+      // SVG Donut Chart
+      let cumulativePct = 0;
+      const circles = entries.slice(0, 5).map(([cat, amt], idx) => {
+        const pct = (amt / totalExp) * 100;
+        const dashArray = `${pct} ${100 - pct}`;
+        const dashOffset = 25 - cumulativePct;
+        cumulativePct += pct;
+        return `<circle cx="18" cy="18" r="15.915" fill="transparent" stroke="${palette[idx % palette.length]}" stroke-width="3.8" stroke-dasharray="${dashArray}" stroke-dashoffset="${dashOffset}"></circle>`;
+      }).join('');
+
+      donutBox.innerHTML = `
+        <svg viewBox="0 0 36 36" class="w-full h-full">
+          <circle cx="18" cy="18" r="15.915" fill="transparent" stroke="#102D23" stroke-width="3.8"></circle>
+          ${circles}
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <span class="text-[9px] app-muted uppercase">Spent</span>
+          <span class="text-xs font-mono font-extrabold text-white">${cur}${stats.expense.toLocaleString('en-IN')}</span>
+        </div>
+      `;
+
+      legendBox.innerHTML = entries.slice(0, 4).map(([cat, amt], idx) => {
+        const pct = Math.round((amt / totalExp) * 100);
+        return `
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 truncate">
+              <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${palette[idx % palette.length]}"></span>
+              <span class="truncate font-semibold">${cat}</span>
+            </div>
+            <span class="font-mono text-[11px] app-muted">${pct}% (${cur}${amt})</span>
+          </div>
+        `;
+      }).join('') || `<div class="text-xs app-muted">Add expenses to view chart</div>`;
+
+      // Combined Spend & Earn Per Category
+      const allCats = Array.from(new Set([...Object.keys(stats.catincome || {}), ...Object.keys(stats.catIncome || {}), ...Object.keys(stats.catExpense || {})]));
+      catList.innerHTML = allCats.map(cat => {
+        const spent = stats.catExpense[cat] || 0;
+        const earned = stats.catIncome[cat] || 0;
+        const pct = Math.min(100, Math.round((spent / totalExp) * 100));
+        return `
+          <div class="p-2.5 rounded-xl app-elevated space-y-1">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold">${cat}</span>
+              <div class="flex items-center gap-2 font-mono text-[11px]">
+                ${earned > 0 ? `<span class="text-emerald-400 font-bold">+${cur}${earned.toLocaleString('en-IN')}</span>` : ''}
+                ${spent > 0 ? `<span class="text-rose-400 font-bold">-${cur}${spent.toLocaleString('en-IN')}</span>` : ''}
+              </div>
+            </div>
+            ${spent > 0 ? `
+              <div class="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#38BDF8] to-[#10B981]" style="width:${pct}%"></div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==============================================================
+    // BACKGROUND DYNAMIC ISLAND SIMULATOR (UPI + SALARY INFLOW)
+    // ==============================================================
+    function toggleBackgroundSimulation() {
+      // Check Notification & Overlay Permissions first!
+      if (!state.isBackgroundMode) {
+        if (state.permissions.notifications !== 'granted' || state.permissions.overlay !== 'granted') {
+          openPermissionModal(true);
+          showToast('Enable Notification & Overlay permissions for Dynamic Island!');
+          return;
+        }
+      }
+
+      state.isBackgroundMode = !state.isBackgroundMode;
+      document.getElementById('backgroundPhoneScreen').classList.toggle('hidden', !state.isBackgroundMode);
+      document.getElementById('backgroundPhoneScreen').classList.toggle('flex', state.isBackgroundMode);
+      document.getElementById('foregroundAppContainer').classList.toggle('hidden', state.isBackgroundMode);
+
+      const dot = document.getElementById('appStateDot');
+      const txt = document.getElementById('appStateText');
+      const btn = document.getElementById('bgToggleBtn');
+
+      if (state.isBackgroundMode) {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-[#38BDF8] animate-ping shrink-0';
+        txt.textContent = 'Phone Home Screen (Dynamic Island Active)';
+        btn.textContent = '🏠 Open Simple Budget';
+        collapseDynamicIsland();
+      } else {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0';
+        txt.textContent = 'In-App Mode (Island Standby)';
+        btn.textContent = '📱 Minimize App (Test Island)';
+      }
+      renderHeaderAndMascot();
+    }
+
+    function setIslandType(type) {
+      state.islandType = type;
+      const bExp = document.getElementById('islandBtnExp');
+      const bInc = document.getElementById('islandBtnInc');
+      if (type === 'income') {
+        bInc.className = 'py-1.5 rounded-lg text-xs font-extrabold app-gradient-btn';
+        bExp.className = 'py-1.5 rounded-lg text-xs font-extrabold text-[#8AA399]';
+        if (!state.incomeCategories.includes(state.selectedCategory)) {
+          state.selectedCategory = state.incomeCategories[0] || 'Salary';
+        }
+      } else {
+        bExp.className = 'py-1.5 rounded-lg text-xs font-extrabold app-gradient-btn';
+        bInc.className = 'py-1.5 rounded-lg text-xs font-extrabold text-[#8AA399]';
+        if (!state.expenseCategories.includes(state.selectedCategory)) {
+          state.selectedCategory = state.expenseCategories[0] || 'Food';
+        }
+      }
+      renderIslandChips();
+      renderHeaderAndMascot();
+    }
+
+    function renderIslandChips() {
+      const payEl = document.getElementById('islandPaymentChips');
+      if (payEl) {
+        payEl.innerHTML = state.paymentMethods.map(p => `
+          <button type="button" onclick="event.stopPropagation(); state.selectedPayment='${p}'; renderIslandChips()"
+                  class="px-2.5 py-1 rounded-lg text-[10px] font-bold shrink-0 ${state.selectedPayment === p ? 'app-gradient-btn' : 'bg-[#081A14] text-[#8AA399] border border-[#194234]'}">
+            ${p}
+          </button>
+        `).join('');
+      }
+
+      const cats = state.islandType === 'income' ? state.incomeCategories : state.expenseCategories;
+      const catEl = document.getElementById('islandCategoryChips');
+      if (catEl) {
+        catEl.innerHTML = cats.map(c => `
+          <button type="button" onclick="event.stopPropagation(); state.selectedCategory='${c}'; renderIslandChips()"
+                  class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${state.selectedCategory === c ? 'app-gradient-btn' : 'bg-[#081A14] text-[#8AA399] border border-[#194234]'}">
+            ${c}
+          </button>
+        `).join('');
+      }
+    }
+
+    function triggerBackgroundUpi(paymentType, amount, category, note, isIncome) {
+      state.selectedPayment = paymentType;
+      state.selectedCategory = category;
+      setIslandType(isIncome ? 'income' : 'expense');
+
+      document.getElementById('islandInputAmount').value = amount;
+      document.getElementById('islandInputNote').value = note;
+      document.getElementById('islandCompactLabel').textContent = `${isIncome ? '💰 +' : '💸 -'}${state.currency}${amount} • ${note}`;
+      document.getElementById('islandWhistleTitle').textContent = isIncome
+        ? 'Penny Purring: Income Detected ★'
+        : 'Penny Whistling: UPI Detected ♪ ♫';
+
+      expandDynamicIsland();
+    }
+
+    function expandDynamicIsland() {
+      const pill = document.getElementById('dynamicIsland');
+      const body = document.getElementById('islandExpandedBody');
+      state.islandExpanded = true;
+      pill.style.width = '100%';
+      pill.style.height = 'auto';
+      body.classList.remove('hidden');
+      body.classList.add('flex');
+      renderIslandChips();
+      renderHeaderAndMascot();
+    }
+
+    function collapseDynamicIsland(e) {
+      if (e) e.stopPropagation();
+      const pill = document.getElementById('dynamicIsland');
+      const body = document.getElementById('islandExpandedBody');
+      state.islandExpanded = false;
+      pill.style.width = '285px';
+      pill.style.height = '46px';
+      body.classList.add('hidden');
+      body.classList.remove('flex');
+    }
+
+    function saveFromDynamicIsland(e) {
+      if (e) e.stopPropagation();
+      const amt = Number(document.getElementById('islandInputAmount').value) || 0;
+      if (amt <= 0) {
+        showToast('Enter a valid amount!');
+        return;
+      }
+      const note = document.getElementById('islandInputNote').value.trim() || state.selectedCategory;
+      const isInc = state.islandType === 'income';
+
+      state.sheets[state.activeMonth].unshift({
+        id: 'isl_' + Date.now(),
+        date: state.islandDate || '8-Nov',
+        paymentType: state.selectedPayment,
+        category: state.selectedCategory,
+        description: note,
+        expense: isInc ? 0 : amt,
+        income: isInc ? amt : 0
+      });
+
+      state.mascotOverrideMood = isInc ? 'HAPPY' : 'WHISTLE';
+      setTimeout(() => { state.mascotOverrideMood = null; renderHeaderAndMascot(); }, 3500);
+
+      collapseDynamicIsland();
+      saveState();
+      renderAll();
+      showToast(`Logged ${isInc ? '+' : '-'}${state.currency}${amt} in ${state.activeMonth}!`);
+    }
+
+    // ==============================================================
+    // ADD / EDIT TRANSACTION MODAL + FULL-SCREEN MATH KEYBOARD
+    // ==============================================================
+    function openAddEntryModal() {
+      state.editingTxId = null;
+      state.mathExpr = '';
+      document.getElementById('modalTitleText').textContent = 'Add Transaction';
+      document.getElementById('modalAmountInput').value = '';
+      document.getElementById('modalDescInput').value = '';
+      document.getElementById('modalRecurringCheck').checked = false;
+      document.getElementById('modalRecurringDayBox').classList.add('hidden');
+      setModalType('expense');
+      applyModalSizeUI();
+      renderModalRecurringStrip();
+      document.getElementById('addEntryModalOverlay').classList.remove('hidden');
+    }
+
+    function openEditTransaction(txId) {
+      const rows = state.sheets[state.activeMonth] || [];
+      const tx = rows.find(r => r.id === txId);
+      if (!tx) return;
+
+      state.editingTxId = txId;
+      const isInc = Number(tx.income) > 0;
+      const val = isInc ? Number(tx.income) : Number(tx.expense);
+      state.selectedPayment = tx.paymentType;
+      state.selectedCategory = tx.category;
+      state.selectedDate = tx.date;
+      state.mathExpr = String(val);
+
+      document.getElementById('modalTitleText').textContent = 'Edit Transaction';
+      document.getElementById('modalAmountInput').value = val;
+      document.getElementById('modalDescInput').value = tx.description || '';
+      document.getElementById('modalDateDisplay').textContent = tx.date;
+      setModalType(isInc ? 'income' : 'expense');
+      applyModalSizeUI();
+      renderModalRecurringStrip();
+      document.getElementById('addEntryModalOverlay').classList.remove('hidden');
+    }
+
+    function deleteTransaction(txId) {
+      state.sheets[state.activeMonth] = (state.sheets[state.activeMonth] || []).filter(r => r.id !== txId);
+      saveState();
+      renderAll();
+      showToast('Transaction deleted');
+    }
+
+    function closeAddEntryModal() {
+      document.getElementById('addEntryModalOverlay').classList.add('hidden');
+    }
+
+    function toggleEntryModalSize() {
+      state.modalFullScreen = !state.modalFullScreen;
+      saveState();
+      applyModalSizeUI();
+    }
+
+    function applyModalSizeUI() {
+      const sheet = document.getElementById('addEntrySheet');
+      const kb = document.getElementById('fullScreenMathKeyboard');
+      const btn = document.getElementById('modalSizeToggleBtn');
+      if (state.modalFullScreen) {
+        sheet.classList.add('min-h-[88vh]');
+        kb.classList.remove('hidden');
+        btn.textContent = '🗕 Compact';
+      } else {
+        sheet.classList.remove('min-h-[88vh]');
+        kb.classList.add('hidden');
+        btn.textContent = '⛶ Full Screen';
+      }
+      updateModalMascotPreview();
+    }
+
+    function setModalType(type) {
+      state.modalType = type;
+      const bExp = document.getElementById('modalBtnExp');
+      const bInc = document.getElementById('modalBtnInc');
+      if (type === 'income') {
+        bInc.className = 'py-2 rounded-lg text-xs font-extrabold app-gradient-btn';
+        bExp.className = 'py-2 rounded-lg text-xs font-extrabold app-muted';
+        if (!state.incomeCategories.includes(state.selectedCategory)) {
+          state.selectedCategory = state.incomeCategories[0] || 'Salary';
+        }
+      } else {
+        bExp.className = 'py-2 rounded-lg text-xs font-extrabold app-gradient-btn';
+        bInc.className = 'py-2 rounded-lg text-xs font-extrabold app-muted';
+        if (!state.expenseCategories.includes(state.selectedCategory)) {
+          state.selectedCategory = state.expenseCategories[0] || 'Food';
+        }
+      }
+      renderModalChips();
+      updateModalMascotPreview();
+    }
+
+    function renderModalChips() {
+      const payEl = document.getElementById('modalPaymentChips');
+      if (payEl) {
+        payEl.innerHTML = state.paymentMethods.map(p => `
+          <button type="button" onclick="state.selectedPayment='${p}'; renderModalChips()"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold ${state.selectedPayment === p ? 'app-gradient-btn' : 'app-elevated'}">
+            ${p}
+          </button>
+        `).join('');
+      }
+
+      const cats = state.modalType === 'income' ? state.incomeCategories : state.expenseCategories;
+      const catEl = document.getElementById('modalCategoryChips');
+      if (catEl) {
+        catEl.innerHTML = cats.map(c => `
+          <button type="button" onclick="state.selectedCategory='${c}'; renderModalChips()"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold ${state.selectedCategory === c ? 'app-gradient-btn' : 'app-elevated'}">
+            ${c}
+          </button>
+        `).join('');
+      }
+    }
+
+    function syncAmountFromInput(val) {
+      state.mathExpr = val;
+      document.getElementById('mathExprPreview').textContent = val || '0';
+      updateModalMascotPreview();
+    }
+
+    function mathKey(k) {
+      if (k === 'C') {
+        state.mathExpr = '';
+      } else if (k === 'BACK') {
+        state.mathExpr = state.mathExpr.slice(0, -1);
+      } else if (k === '=') {
+        try {
+          const sanitized = state.mathExpr.replace(/[^0-9+\-*/.]/g, '');
+          const result = Function(`"use strict"; return (${sanitized || 0})`)();
+          state.mathExpr = String(Math.round(result * 100) / 100);
+        } catch (e) {}
+      } else {
+        state.mathExpr += k;
+      }
+
+      document.getElementById('mathExprPreview').textContent = state.mathExpr || '0';
+      try {
+        const sanitized = state.mathExpr.replace(/[^0-9+\-*/.]/g, '');
+        if (sanitized && !/[+\-*/.]$/.test(sanitized)) {
+          const val = Function(`"use strict"; return (${sanitized})`)();
+          document.getElementById('modalAmountInput').value = Math.round(val * 100) / 100;
+        } else {
+          document.getElementById('modalAmountInput').value = state.mathExpr;
+        }
+      } catch (e) {
+        document.getElementById('modalAmountInput').value = state.mathExpr;
+      }
+      updateModalMascotPreview();
+    }
+
+    function updateModalMascotPreview() {
+      const amt = Number(document.getElementById('modalAmountInput')?.value) || 0;
+      const iconBox = document.getElementById('modalMascotIcon');
+      const subText = document.getElementById('modalSubText');
+      if (!iconBox || !subText) return;
+
+      if (state.modalType === 'income') {
+        iconBox.innerHTML = getPennyCatSvg('HAPPY');
+        subText.textContent = amt > 0 ? `Penny is purring! +${state.currency}${amt} Income ★` : 'Log your Salary or extra income ★';
+      } else if (amt >= 2000) {
+        iconBox.innerHTML = getPennyCatSvg('WORRIED');
+        subText.textContent = `Big expense (${state.currency}${amt})! Penny is sweating 💧`;
+      } else if (amt > 0) {
+        iconBox.innerHTML = getPennyCatSvg('WHISTLE');
+        subText.textContent = `Penny whistling: Logging ${state.currency}${amt} ♪`;
+      } else {
+        iconBox.innerHTML = getPennyCatSvg('CALM');
+        subText.textContent = 'Penny is ready to log your transaction';
+      }
+    }
+
+    function toggleModalRecurringUI() {
+      const checked = document.getElementById('modalRecurringCheck').checked;
+      document.getElementById('modalRecurringDayBox').classList.toggle('hidden', !checked);
+    }
+
+    function renderModalRecurringStrip() {
+      const box = document.getElementById('modalRecurringQuickList');
+      if (!box) return;
+      box.innerHTML = state.recurringRules.map(r => `
+        <button type="button" onclick="fillFromRecurringRule('${r.id}')"
+                class="px-2.5 py-1.5 rounded-xl app-elevated text-[10px] font-bold shrink-0 flex items-center gap-1.5 hover:border-[#38BDF8]">
+          <span>🔁 ${r.title}</span>
+          <span class="font-mono ${r.type === 'income' ? 'text-emerald-400' : 'text-[#38BDF8]'}">${state.currency}${r.amount}</span>
+        </button>
+      `).join('');
+    }
+
+    function fillFromRecurringRule(ruleId) {
+      const r = state.recurringRules.find(x => x.id === ruleId);
+      if (!r) return;
+      setModalType(r.type);
+      state.selectedCategory = r.category;
+      state.selectedPayment = r.paymentType;
+      document.getElementById('modalAmountInput').value = r.amount;
+      document.getElementById('modalDescInput').value = r.title;
+      renderModalChips();
+      updateModalMascotPreview();
+      showToast(`Filled "${r.title}"`);
+    }
+
+    function runDueRecurringNow() {
+      state.recurringRules.forEach(r => {
+        state.sheets[state.activeMonth].unshift({
+          id: 'rec_tx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+          date: `${r.day}-Nov`,
+          paymentType: r.paymentType,
+          category: r.category,
+          description: `${r.title} (Auto-Recurring)`,
+          expense: r.type === 'expense' ? r.amount : 0,
+          income: r.type === 'income' ? r.amount : 0
+        });
+      });
+      saveState();
+      renderAll();
+      closeAddEntryModal();
+      showToast('All monthly recurring transactions logged!');
+    }
+
+    function saveModalTransaction() {
+      let rawAmt = document.getElementById('modalAmountInput').value;
+      try {
+        const sanitized = String(rawAmt).replace(/[^0-9+\-*/.]/g, '');
+        rawAmt = Function(`"use strict"; return (${sanitized || 0})`)();
+      } catch (e) {}
+      const amt = Number(rawAmt) || 0;
+      if (amt <= 0) {
+        showToast('Please enter an amount greater than 0');
+        return;
+      }
+
+      const desc = document.getElementById('modalDescInput').value.trim() || state.selectedCategory;
+      const isInc = state.modalType === 'income';
+
+      if (state.editingTxId) {
+        const idx = state.sheets[state.activeMonth].findIndex(r => r.id === state.editingTxId);
+        if (idx > -1) {
+          state.sheets[state.activeMonth][idx] = {
+            ...state.sheets[state.activeMonth][idx],
+            date: state.selectedDate,
+            paymentType: state.selectedPayment,
+            category: state.selectedCategory,
+            description: desc,
+            expense: isInc ? 0 : amt,
+            income: isInc ? amt : 0
+          };
+        }
+      } else {
+        state.sheets[state.activeMonth].unshift({
+          id: 'tx_' + Date.now(),
+          date: state.selectedDate,
+          paymentType: state.selectedPayment,
+          category: state.selectedCategory,
+          description: desc,
+          expense: isInc ? 0 : amt,
+          income: isInc ? amt : 0
+        });
+
+        if (document.getElementById('modalRecurringCheck').checked) {
+          const day = Number(document.getElementById('modalRecurringDayInput').value) || 5;
+          state.recurringRules.push({
+            id: 'rec_' + Date.now(),
+            title: desc,
+            amount: amt,
+            type: state.modalType,
+            category: state.selectedCategory,
+            paymentType: state.selectedPayment,
+            day
+          });
+        }
+      }
+
+      state.mascotOverrideMood = isInc ? 'HAPPY' : 'WHISTLE';
+      setTimeout(() => { state.mascotOverrideMood = null; renderHeaderAndMascot(); }, 3000);
+
+      saveState();
+      renderAll();
+      closeAddEntryModal();
+      showToast(state.editingTxId ? 'Transaction updated ✓' : 'Transaction saved ✓');
+    }
+
+    // ==============================================================
+    // STANDARD CALENDAR DATE PICKER MODAL
+    // ==============================================================
+    function openCalendarModal(target) {
+      state.calendarTarget = target || 'modal';
+      renderCalendarGrid();
+      document.getElementById('calendarModalOverlay').classList.remove('hidden');
+    }
+
+    function closeCalendarModal() {
+      document.getElementById('calendarModalOverlay').classList.add('hidden');
+    }
+
+    function renderCalendarGrid() {
+      const monthIdx = Number(document.getElementById('calMonthSelect').value);
+      const year = Number(document.getElementById('calYearSelect').value);
+      const firstDay = new Date(year, monthIdx, 1).getDay();
+      const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+      const container = document.getElementById('calendarDaysContainer');
+      if (!container) return;
+
+      let html = '';
+      for (let i = 0; i < firstDay; i++) {
+        html += `<div></div>`;
+      }
+      const mShort = MONTH_NAMES_SHORT[monthIdx];
+      for (let d = 1; d <= daysInMonth; d++) {
+        const formatted = `${d}-${mShort}`;
+        const isSel = (state.calendarTarget === 'island' ? state.islandDate : state.selectedDate) === formatted;
+        html += `
+          <button type="button" onclick="pickCalendarDay('${formatted}')"
+                  class="py-2 rounded-xl font-bold ${isSel ? 'app-gradient-btn' : 'app-elevated hover:border-[#38BDF8]'}">
+            ${d}
+          </button>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    function pickCalendarDay(formattedDate) {
+      if (state.calendarTarget === 'island') {
+        state.islandDate = formattedDate;
+        document.getElementById('islandDateText').textContent = formattedDate;
+      } else {
+        state.selectedDate = formattedDate;
+        document.getElementById('modalDateDisplay').textContent = formattedDate;
+      }
+      closeCalendarModal();
+    }
+
+    function selectTodayCalendar() {
+      pickCalendarDay('8-Nov');
+    }
+
+    // ==============================================================
+    // MULTI-MONTH COMPARISON & SHAREABLE VISUAL CARD
+    // ==============================================================
+    function toggleCompareMonthChip(mKey) {
+      if (state.compareSelectedMonths.includes(mKey)) {
+        if (state.compareSelectedMonths.length > 1) {
+          state.compareSelectedMonths = state.compareSelectedMonths.filter(m => m !== mKey);
+        }
+      } else {
+        state.compareSelectedMonths.push(mKey);
+      }
+      saveState();
+      renderComparisonTab();
+    }
+
+    function selectAllCompareMonths() {
+      state.compareSelectedMonths = [...ALL_MONTH_KEYS];
+      saveState();
+      renderComparisonTab();
+    }
+
+    function renderComparisonTab() {
+      const cur = state.currency;
+      const chipsEl = document.getElementById('multiMonthCompareChips');
+      if (chipsEl) {
+        chipsEl.innerHTML = ALL_MONTH_KEYS.map(m => {
+          const active = state.compareSelectedMonths.includes(m);
+          return `
+            <button onclick="toggleCompareMonthChip('${m}')"
+                    class="px-3 py-1.5 rounded-xl text-xs font-mono font-extrabold ${active ? 'app-gradient-btn' : 'app-elevated opacity-70'}">
+              ${active ? '✓ ' : ''}${m}
+            </button>
+          `;
+        }).join('');
+      }
+
+      const selected = state.compareSelectedMonths;
+      const statsMap = {};
+      let maxVal = 1;
+      selected.forEach(m => {
+        statsMap[m] = getMonthStats(m);
+        maxVal = Math.max(maxVal, statsMap[m].expense, statsMap[m].income);
+      });
+
+      // Visual Grouped Bar Chart
+      const chartBox = document.getElementById('multiMonthVisualChart');
+      if (chartBox) {
+        chartBox.innerHTML = selected.map(m => {
+          const st = statsMap[m];
+          const expPct = Math.max(4, Math.round((st.expense / maxVal) * 100));
+          const incPct = Math.max(4, Math.round((st.income / maxVal) * 100));
+          return `
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] font-mono">
+                <span class="font-extrabold text-white">${m}</span>
+                <div class="flex gap-3">
+                  <span class="text-rose-400">Out: ${cur}${st.expense.toLocaleString('en-IN')}</span>
+                  <span class="text-emerald-400">In: ${cur}${st.income.toLocaleString('en-IN')}</span>
+                </div>
+              </div>
+              <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden flex gap-0.5">
+                <div class="h-full bg-rose-400 rounded-full" style="width:${expPct}%"></div>
+              </div>
+              <div class="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-400 rounded-full" style="width:${incPct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Summary Cards
+      const cardsEl = document.getElementById('compareSummaryCards');
+      if (cardsEl) {
+        cardsEl.innerHTML = selected.map(m => {
+          const st = statsMap[m];
+          return `
+            <div class="p-3 rounded-2xl app-elevated space-y-1">
+              <div class="text-xs font-mono font-extrabold text-[#38BDF8]">${m}</div>
+              <div class="text-[11px] flex justify-between"><span>Spent:</span><span class="font-mono font-bold text-rose-400">${cur}${st.expense.toLocaleString('en-IN')}</span></div>
+              <div class="text-[11px] flex justify-between"><span>Net:</span><span class="font-mono font-bold text-emerald-400">${cur}${st.balance.toLocaleString('en-IN')}</span></div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Active Month Payment Breakdown
+      document.getElementById('compareActiveMonthTag').textContent = state.activeMonth;
+      const activeStats = getMonthStats(state.activeMonth);
+      const payEl = document.getElementById('analyticsPaymentBreakdown');
+      if (payEl) {
+        payEl.innerHTML = state.paymentMethods.map(p => {
+          const amt = activeStats.payTotals[p] || 0;
+          return `
+            <div class="p-2.5 rounded-xl app-elevated flex items-center justify-between text-xs">
+              <span class="font-bold">${p}</span>
+              <span class="font-mono font-extrabold text-[#38BDF8]">${cur}${amt.toLocaleString('en-IN')}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Category Matrix Across Selected Months
+      const catDeltaEl = document.getElementById('analyticsCategoryDeltaList');
+      if (catDeltaEl) {
+        catDeltaEl.innerHTML = state.expenseCategories.slice(0, 8).map(cat => {
+          const badges = selected.map(m => {
+            const v = statsMap[m].catExpense[cat] || 0;
+            return `<span class="px-2 py-0.5 rounded bg-black/30 font-mono text-[10px]">${m}: ${cur}${v}</span>`;
+          }).join('');
+          return `
+            <div class="p-2.5 rounded-xl app-elevated space-y-1.5">
+              <div class="text-xs font-extrabold">${cat}</div>
+              <div class="flex flex-wrap gap-1.5">${badges}</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function openShareCardModal() {
+      const stats = getMonthStats(state.activeMonth);
+      const cur = state.currency;
+      document.getElementById('shareCardMascot').innerHTML = getPennyCatSvg(computeAutoMascotMood());
+      document.getElementById('shareCardSubtitle').textContent = `${state.activeMonth} SUMMARY`;
+      document.getElementById('shareCardSpent').textContent = `${cur}${stats.expense.toLocaleString('en-IN')}`;
+      document.getElementById('shareCardEarned').textContent = `${cur}${stats.income.toLocaleString('en-IN')}`;
+      document.getElementById('shareCardNet').textContent = `${cur}${stats.balance.toLocaleString('en-IN')}`;
+
+      const topCats = Object.entries(stats.catExpense).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      document.getElementById('shareCardTopCats').textContent = topCats.length
+        ? 'Top Spend: ' + topCats.map(([c, v]) => `${c} (${cur}${v})`).join(' • ')
+        : 'Clean slate this month!';
+
+      document.getElementById('shareCardModal').classList.remove('hidden');
+    }
+
+    function closeShareCardModal() {
+      document.getElementById('shareCardModal').classList.add('hidden');
+    }
+
+    function copyShareSummaryText() {
+      const stats = getMonthStats(state.activeMonth);
+      const cur = state.currency;
+      const text = `📊 Simple Budget (${state.activeMonth})\n💸 Spent: ${cur}${stats.expense}\n💰 Earned: ${cur}${stats.income}\n✨ Balance: ${cur}${stats.balance}`;
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Summary copied for WhatsApp!');
+    }
+
+    // ==============================================================
+    // GOALS & RECEIPT SCANNER (OCR)
+    // ==============================================================
+    function renderGoals() {
+      const cur = state.currency;
+      const totalSaved = state.piggyGoals.reduce((acc, g) => acc + (Number(g.saved) || 0), 0);
+      const badge = document.getElementById('homePiggyBadge');
+      if (badge) badge.textContent = `${cur}${totalSaved.toLocaleString('en-IN')}`;
+
+      const homeList = document.getElementById('homeGoalsCompactList');
+      if (homeList) {
+        homeList.innerHTML = state.piggyGoals.map(g => {
+          const pct = Math.min(100, Math.round((g.saved / (g.target || 1)) * 100));
+          return `
+            <div class="p-2.5 rounded-2xl app-elevated space-y-1.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold truncate">${g.title}</span>
+                <span class="font-mono text-[10px] text-emerald-400 font-bold">${pct}%</span>
+              </div>
+              <div class="w-full h-1.5 bg-black/40 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#38BDF8] to-[#10B981]" style="width:${pct}%"></div>
+              </div>
+              <div class="flex items-center justify-between text-[10px] font-mono app-muted">
+                <span>${cur}${g.saved.toLocaleString('en-IN')} / ${cur}${g.target.toLocaleString('en-IN')}</span>
+                <button onclick="addMoneyToGoal('${g.id}', 500)" class="text-[#38BDF8] font-bold hover:underline">+${cur}500</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const fullList = document.getElementById('piggyGoalsList');
+      if (fullList) {
+        fullList.innerHTML = state.piggyGoals.map(g => {
+          const pct = Math.min(100, Math.round((g.saved / (g.target || 1)) * 100));
+          return `
+            <div class="p-3 rounded-2xl app-elevated space-y-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-extrabold">${g.title}</div>
+                  <div class="text-[10px] font-mono app-muted">${cur}${g.saved.toLocaleString('en-IN')} of ${cur}${g.target.toLocaleString('en-IN')} (${pct}%)</div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="addMoneyToGoal('${g.id}', 500)" class="px-2.5 py-1 rounded-xl app-gradient-btn text-[10px] font-extrabold">+${cur}500</button>
+                  <button onclick="deleteGoal('${g.id}')" class="p-1 rounded-lg bg-black/30 text-rose-400 text-xs">✕</button>
+                </div>
+              </div>
+              <div class="w-full h-2 bg-black/40 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#38BDF8] to-[#10B981]" style="width:${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function addMoneyToGoal(id, amount) {
+      const g = state.piggyGoals.find(x => x.id === id);
+      if (!g) return;
+      g.saved = Number(g.saved || 0) + amount;
+      saveState();
+      renderGoals();
+      showToast(`Added ${state.currency}${amount} to ${g.title}!`);
+    }
+
+    function createNewPiggyGoal() {
+      const title = document.getElementById('piggyTitleInput').value.trim();
+      const target = Number(document.getElementById('piggyTargetInput').value) || 0;
+      if (!title || target <= 0) {
+        showToast('Enter a valid goal name and target amount');
+        return;
+      }
+      state.piggyGoals.push({ id: 'pig_' + Date.now(), title, target, saved: 0 });
+      document.getElementById('piggyTitleInput').value = '';
+      document.getElementById('piggyTargetInput').value = '';
+      saveState();
+      renderGoals();
+      showToast(`Goal "${title}" created!`);
+    }
+
+    function deleteGoal(id) {
+      state.piggyGoals = state.piggyGoals.filter(g => g.id !== id);
+      saveState();
+      renderGoals();
+    }
+
+    function openReceiptScannerModal() {
+      if (state.permissions.camera !== 'granted') {
+        openPermissionModal(true);
+        showToast('Camera permission needed for Receipt OCR');
+        return;
+      }
+      document.getElementById('ocrExtractedPreview').classList.add('hidden');
+      document.getElementById('receiptScannerModal').classList.remove('hidden');
+    }
+
+    function closeReceiptScannerModal() {
+      document.getElementById('receiptScannerModal').classList.add('hidden');
+    }
+
+    function simulateReceiptOcr(merchant, amount, category, paymentType) {
+      pendingOcrResult = { merchant, amount, category, paymentType };
+      document.getElementById('ocrMerchantText').textContent = `${merchant} (${category})`;
+      document.getElementById('ocrAmountText').textContent = `${state.currency}${amount}`;
+      document.getElementById('ocrExtractedPreview').classList.remove('hidden');
+    }
+
+    function handleReceiptImageUpload(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      simulateReceiptOcr(file.name.replace(/\.[^.]+$/, ''), 420, 'Shopping', 'UPI Lite');
+    }
+
+    function confirmOcrToEntryModal() {
+      if (!pendingOcrResult) return;
+      closeReceiptScannerModal();
+      openAddEntryModal();
+      setModalType('expense');
+      state.selectedCategory = pendingOcrResult.category;
+      state.selectedPayment = pendingOcrResult.paymentType;
+      document.getElementById('modalAmountInput').value = pendingOcrResult.amount;
+      document.getElementById('modalDescInput').value = pendingOcrResult.merchant;
+      renderModalChips();
+      updateModalMascotPreview();
+    }
+
+    function renderAll() {
+      renderHeaderAndMascot();
+      renderHomeDashboard();
+      renderGoals();
+      renderComparisonTab();
+      renderNothingNotepad();
+      renderCategoriesAndPaymentsManager();
+      renderPermissionBannerAndSettings();
+    }
+
+    // ==============================================================
+    // MODERN FINANCIAL MEMO PAD & REARRANGE CATEGORIES
+    // ==============================================================
+    function renderNothingNotepad() {
+      const grid = document.getElementById('nothingNotesGrid');
+      const titleInp = document.getElementById('nothingNoteTitle');
+      const bodyInp = document.getElementById('nothingNoteBody');
+      const charCount = document.getElementById('memoCharCount');
+      const timeBadge = document.getElementById('nothingNoteTimestamp');
+      if (!grid || !titleInp || !bodyInp) return;
+
+      const activeNote = state.nothingNotes.find(n => n.id === state.activeNothingNoteId) || state.nothingNotes[0];
+      if (activeNote) {
+        state.activeNothingNoteId = activeNote.id;
+        if (document.activeElement !== titleInp) titleInp.value = activeNote.title;
+        if (document.activeElement !== bodyInp) bodyInp.value = activeNote.body;
+        if (charCount) charCount.textContent = `${(activeNote.body || '').length} chars`;
+        if (timeBadge) timeBadge.textContent = activeNote.tag || '📌 Memo';
+      }
+
+      grid.innerHTML = state.nothingNotes.map(n => {
+        const isSel = n.id === state.activeNothingNoteId;
+        const preview = (n.body || 'Empty note...').replace(/\n/g, ' ');
+        return `
+          <div onclick="selectNothingNote('${n.id}')"
+               class="min-w-[155px] max-w-[180px] p-3 rounded-2xl cursor-pointer transition shrink-0 flex flex-col justify-between border ${
+                 isSel
+                   ? 'bg-gradient-to-br from-[#102D23] to-[#0A2536] border-[#38BDF8] shadow-md'
+                   : 'app-elevated opacity-80 hover:opacity-100'
+               }">
+            <div>
+              <div class="flex items-center justify-between gap-1.5">
+                <span class="text-[9.5px] font-mono font-bold px-2 py-0.5 rounded-md bg-black/30 text-[#38BDF8]">${n.tag || '📌 Memo'}</span>
+                <button onclick="deleteNothingNote(event, '${n.id}')" class="text-[11px] app-muted hover:text-rose-400 px-1">✕</button>
+              </div>
+              <div class="text-xs font-extrabold truncate mt-1.5 text-white">${n.title || 'Untitled Memo'}</div>
+            </div>
+            <p class="text-[10.5px] app-muted truncate mt-1">${preview}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectNothingNote(id) {
+      state.activeNothingNoteId = id;
+      saveState();
+      renderNothingNotepad();
+    }
+
+    function saveCurrentNothingNote() {
+      const titleInp = document.getElementById('nothingNoteTitle');
+      const bodyInp = document.getElementById('nothingNoteBody');
+      const charCount = document.getElementById('memoCharCount');
+      const note = state.nothingNotes.find(n => n.id === state.activeNothingNoteId);
+      if (note) {
+        note.title = titleInp.value || 'Untitled Memo';
+        note.body = bodyInp.value;
+        if (charCount) charCount.textContent = `${note.body.length} chars`;
+        saveState();
+        renderNothingNotepad();
+      }
+    }
+
+    function insertMemoSnippet(snippet) {
+      const bodyInp = document.getElementById('nothingNoteBody');
+      if (!bodyInp) return;
+      const start = bodyInp.selectionStart || bodyInp.value.length;
+      const end = bodyInp.selectionEnd || bodyInp.value.length;
+      const val = bodyInp.value;
+      const prefix = (snippet === '☐ ' || snippet === '• ') && start > 0 && val[start - 1] !== '\n' ? '\n' : '';
+      bodyInp.value = val.slice(0, start) + prefix + snippet + val.slice(end);
+      bodyInp.focus();
+      saveCurrentNothingNote();
+    }
+
+    function setMemoTag(tag) {
+      const note = state.nothingNotes.find(n => n.id === state.activeNothingNoteId);
+      if (!note) return;
+      note.tag = tag;
+      saveState();
+      renderNothingNotepad();
+      showToast(`Tagged as ${tag}`);
+    }
+
+    function copyCurrentMemo() {
+      const note = state.nothingNotes.find(n => n.id === state.activeNothingNoteId);
+      if (!note) return;
+      const ta = document.createElement('textarea');
+      ta.value = `${note.title}\n\n${note.body}`;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Memo copied to clipboard!');
+    }
+
+    function addNothingNote() {
+      const newId = 'nn_' + Date.now();
+      state.nothingNotes.unshift({ id: newId, title: 'New Memo', tag: '📌 Pinned', body: '☐ ', updated: 'Just now' });
+      state.activeNothingNoteId = newId;
+      saveState();
+      renderNothingNotepad();
+      document.getElementById('nothingNoteTitle')?.focus();
+    }
+
+    function clearNothingNote() {
+      document.getElementById('nothingNoteBody').value = '';
+      saveCurrentNothingNote();
+    }
+
+    function deleteNothingNote(e, id) {
+      e.stopPropagation();
+      if (state.nothingNotes.length <= 1) {
+        clearNothingNote();
+        return;
+      }
+      state.nothingNotes = state.nothingNotes.filter(n => n.id !== id);
+      state.activeNothingNoteId = state.nothingNotes[0].id;
+      saveState();
+      renderNothingNotepad();
+    }
+
+    function renderCategoriesAndPaymentsManager() {
+      const catEl = document.getElementById('manageCategoriesList');
+      if (catEl) {
+        catEl.innerHTML = state.expenseCategories.map((c, idx) => `
+          <div class="p-2 rounded-xl app-elevated flex items-center justify-between text-xs">
+            <span class="font-bold">${c}</span>
+            <div class="flex gap-1">
+              <button onclick="moveItem(state.expenseCategories, ${idx}, -1)" class="px-2 py-0.5 rounded bg-black/30">↑</button>
+              <button onclick="moveItem(state.expenseCategories, ${idx}, 1)" class="px-2 py-0.5 rounded bg-black/30">↓</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const payEl = document.getElementById('managePaymentsList');
+      if (payEl) {
+        payEl.innerHTML = state.paymentMethods.map((p, idx) => `
+          <div class="p-2 rounded-xl app-elevated flex items-center justify-between text-xs">
+            <span class="font-bold">${p}</span>
+            <div class="flex gap-1">
+              <button onclick="moveItem(state.paymentMethods, ${idx}, -1)" class="px-2 py-0.5 rounded bg-black/30">↑</button>
+              <button onclick="moveItem(state.paymentMethods, ${idx}, 1)" class="px-2 py-0.5 rounded bg-black/30">↓</button>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function moveItem(arr, index, dir) {
+      const target = index + dir;
+      if (target < 0 || target >= arr.length) return;
+      const temp = arr[index];
+      arr[index] = arr[target];
+      arr[target] = temp;
+      saveState();
+      renderAll();
+    }
+
+    function addCustomCategory() {
+      const val = document.getElementById('newCategoryInput').value.trim();
+      const type = document.getElementById('newCategoryType').value;
+      if (!val) return;
+      if (type === 'income') state.incomeCategories.push(val);
+      else state.expenseCategories.push(val);
+      document.getElementById('newCategoryInput').value = '';
+      saveState();
+      renderAll();
+      showToast(`Added ${val} category`);
+    }
+
+    function addCustomPaymentMethod() {
+      const val = document.getElementById('newPaymentInput').value.trim();
+      if (!val) return;
+      state.paymentMethods.push(val);
+      document.getElementById('newPaymentInput').value = '';
+      saveState();
+      renderAll();
+      showToast(`Added ${val} payment method`);
+    }
+
+    // ==============================================================
+    // SETTINGS: THEMES, 120HZ/BATTERY SAVER, BIOMETRICS, EXCEL, UPI STATEMENT
+    // ==============================================================
+    function applyTheme(themeName) {
+      state.theme = themeName;
+      document.body.classList.remove('theme-ocean', 'theme-oled', 'theme-paper');
+      if (themeName === 'ocean') document.body.classList.add('theme-ocean');
+      if (themeName === 'oled') document.body.classList.add('theme-oled');
+      if (themeName === 'paper') document.body.classList.add('theme-paper');
+      saveState();
+      showToast(`Theme switched to ${themeName.toUpperCase()}`);
+    }
+
+    function setPerformanceMode(mode) {
+      state.perfMode = mode;
+      document.body.classList.remove('perf-saver');
+      if (mode === 'saver') {
+        document.body.classList.add('perf-saver');
+        document.documentElement.style.setProperty('--anim-speed', '0s');
+      } else if (mode === '60hz') {
+        document.documentElement.style.setProperty('--anim-speed', '0.22s');
+      } else {
+        document.documentElement.style.setProperty('--anim-speed', '0.34s');
+      }
+      ['120hz', '60hz', 'saver'].forEach(m => {
+        const el = document.getElementById(`perf-${m}`);
+        if (el) el.className = m === mode ? 'p-2.5 rounded-2xl app-gradient-btn text-center' : 'p-2.5 rounded-2xl app-elevated text-center';
+      });
+      saveState();
+      showToast(`Performance set to ${mode.toUpperCase()}`);
+    }
+
+    function changeCurrency(sym) {
+      state.currency = sym;
+      saveState();
+      renderAll();
+    }
+
+    function promptMonthlyBudget() {
+      const next = Math.round(state.monthlyBudgetLimit === 15000 ? 20000 : (state.monthlyBudgetLimit === 20000 ? 12000 : 15000));
+      state.monthlyBudgetLimit = next;
+      saveState();
+      renderAll();
+      showToast(`Monthly Target cycled to ${state.currency}${next.toLocaleString('en-IN')}`);
+    }
+
+    function toggleBiometricSetting(checked) {
+      state.biometricEnabled = checked;
+      saveState();
+      showToast(checked ? 'Biometric Lock Enabled' : 'Biometric Lock Disabled');
+    }
+
+    function lockAppNow() {
+      document.getElementById('biometricLockOverlay').classList.remove('hidden');
+    }
+
+    function unlockWithBiometrics() {
+      document.getElementById('biometricLockOverlay').classList.add('hidden');
+      showToast('Unlocked via Biometrics ✓');
+    }
+
+    function exportToExcelWorkbook() {
+      const wb = XLSX.utils.book_new();
+      Object.keys(state.sheets).forEach(monthKey => {
+        const rows = state.sheets[monthKey].map(r => ({
+          Date: r.date,
+          'Payment Type': r.paymentType,
+          Category: r.category,
+          Description: r.description,
+          Expense: r.expense || '',
+          Income: r.income || ''
+        }));
+        const ws = XLSX.utils.json_to_sheet(rows);
+        XLSX.utils.book_append_sheet(wb, ws, monthKey);
+      });
+      XLSX.writeFile(wb, `SimpleBudget_Backup_${state.activeMonth}.xlsx`);
+      showToast('Multi-Tab Excel (.xlsx) Backup Downloaded!');
+    }
+
+    function importFromExcelWorkbook(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const data = new Uint8Array(evt.target.result);
+        const wb = XLSX.read(data, { type: 'array' });
+        let restoredCount = 0;
+        wb.SheetNames.forEach(sheetName => {
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+          if (!state.sheets[sheetName]) state.sheets[sheetName] = [];
+          rows.forEach(r => {
+            if (r.Date && (r.Expense || r.Income)) {
+              state.sheets[sheetName].push({
+                id: 'imp_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                date: String(r.Date),
+                paymentType: r['Payment Type'] || 'UPI Lite',
+                category: r.Category || 'Food',
+                description: r.Description || '',
+                expense: Number(r.Expense) || 0,
+                income: Number(r.Income) || 0
+              });
+              restoredCount++;
+            }
+          });
+        });
+        saveState();
+        renderAll();
+        showToast(`Restored ${restoredCount} rows from Excel!`);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function loadSampleUpiStatement() {
+      document.getElementById('statementRawInput').value =
+        `06-Nov, Paid ₹190 to New Shalimar Biryani via UPI Lite\n07-Nov, Paid ₹310 to Reliance BP Petrol via GPay\n08-Nov, Credited ₹1500 Cashback Bonus to Bank`;
+      parseStatementCandidates();
+    }
+
+    function parseStatementCandidates() {
+      const raw = document.getElementById('statementRawInput').value.trim();
+      if (!raw) return;
+      const lines = raw.split('\n');
+      statementCandidates = lines.map((line, i) => {
+        const amtMatch = line.match(/(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d{1,2})?)/i);
+        const amt = amtMatch ? Number(amtMatch[1]) : 150;
+        const isInc = /credit|salary|received|bonus/i.test(line);
+        const cat = isInc ? 'Other Income' : (/petrol|fuel|bp/i.test(line) ? 'Petrol' : 'Food');
+        return { id: i, text: line, amount: amt, isInc, category: cat, checked: true };
+      });
+
+      const box = document.getElementById('statementCandidatesContainer');
+      box.classList.remove('hidden');
+      box.innerHTML = statementCandidates.map((c, idx) => `
+        <label class="p-2.5 rounded-xl app-elevated flex items-center justify-between text-xs cursor-pointer">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" checked onchange="statementCandidates[${idx}].checked = this.checked" class="accent-[#10B981]" />
+            <span>${c.category}: ${c.text.slice(0, 34)}...</span>
+          </div>
+          <span class="font-mono font-bold ${c.isInc ? 'text-emerald-400' : 'text-rose-400'}">${c.isInc ? '+' : '-'}${state.currency}${c.amount}</span>
+        </label>
+      `).join('') + `
+        <button onclick="confirmStatementImports()" class="w-full py-2.5 rounded-xl app-gradient-btn font-extrabold text-xs">
+          ✓ Import Selected Transactions
+        </button>
+      `;
+    }
+
+    function confirmStatementImports() {
+      let added = 0;
+      statementCandidates.filter(c => c.checked).forEach(c => {
+        state.sheets[state.activeMonth].unshift({
+          id: 'stmt_' + Date.now() + '_' + added,
+          date: '8-Nov',
+          paymentType: 'UPI Lite',
+          category: c.category,
+          description: c.text,
+          expense: c.isInc ? 0 : c.amount,
+          income: c.isInc ? c.amount : 0
+        });
+        added++;
+      });
+      document.getElementById('statementCandidatesContainer').classList.add('hidden');
+      saveState();
+      renderAll();
+      showToast(`Imported ${added} statement transactions!`);
+    }
+
+    // ==============================================================
+    // NAVIGATION & PERSISTENCE
+    // ==============================================================
+    function changeActiveMonth(m) {
+      state.activeMonth = m;
+      saveState();
+      renderAll();
+    }
+
+    function switchTab(tab) {
+      ['home', 'analytics', 'tools', 'settings'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
+        const navBtn = document.getElementById(`nav-${t}`);
+        if (navBtn) {
+          navBtn.className = t === tab
+            ? 'flex flex-col items-center gap-0.5 py-1 px-4 rounded-2xl font-extrabold text-[#38BDF8]'
+            : 'flex flex-col items-center gap-0.5 py-1 px-4 rounded-2xl app-muted';
+        }
+      });
+    }
+
+    function switchToolSubTab(sub) {
+      ['notepad', 'piggy', 'categories'].forEach(s => {
+        const panel = document.getElementById(`tool-panel-${s}`);
+        const btn = document.getElementById(`subtab-${s}`);
+        if (panel) panel.classList.toggle('hidden', s !== sub);
+        if (btn) {
+          btn.className = s === sub
+            ? 'px-3.5 py-2 rounded-xl text-xs font-extrabold app-gradient-btn shrink-0'
+            : 'px-3.5 py-2 rounded-xl text-xs font-extrabold app-elevated shrink-0';
+        }
+      });
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastMessage').textContent = msg;
+      box.classList.remove('hidden');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => box.classList.add('hidden'), 2600);
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('simple_budget_commercial_v5', JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem('simple_budget_commercial_v5');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = { ...state, ...parsed, sheets: { ...state.sheets, ...(parsed.sheets || {}) } };
+        }
+      } catch (e) {}
+    }
+
+    window.onload = function() {
+      loadState();
+      applyTheme(state.theme || 'emerald');
+      setPerformanceMode(state.perfMode || '120hz');
+      document.getElementById('currencySelect').value = state.currency || '₹';
+      document.getElementById('biometricToggle').checked = !!state.biometricEnabled;
+      document.getElementById('nothingNoteTitle')?.addEventListener('input', saveCurrentNothingNote);
+      if (state.biometricEnabled) lockAppNow();
+      renderAll();
+      // Trigger Smart Permission Check (asks once every 24h if any required permission is denied/missing)
+      checkDailyPermissionPrompt(false);
+    };
+  </script>
+</body>
+</html>
